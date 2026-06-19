@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Dify API Key
+dify/config.json
+
+# Database
+data/mdm.db
+
+# Model cache — auto-downloaded (~2.5GB)
+.model_cache/
+
+# ========== 以下文件由脚本生成，不需要上传 ==========
+
+# 运行 generate_dataset.py 生成
+data/crm_customers.csv
+data/erp_customers.csv
+data/ecommerce_customers.csv
+data/erp_products.csv
+data/ecommerce_products.csv
+data/dataset_summary.json
+
+# 运行 mdm_pipeline.py / product_pipeline.py 生成
+data/customer_match_candidates.csv
+data/product_match_candidates.csv
+data/customer_review_queue.csv
+data/product_review_queue.csv
+data/customer_review_enriched.csv
+data/product_review_enriched.csv
+data/golden_customers.csv
+data/golden_products.csv
+data/customer_match_metrics.json
+data/product_match_metrics.json
+
+# 运行 finalize.py 生成
+data/final_golden_customers.csv
+data/final_golden_products.csv
+data/final_customer_metrics.json
+data/final_product_metrics.json
+
+# 运行 tune_thresholds.py 生成
+data/optimized_thresholds.json
+
+# 空缓存目录
+data/cache/
+
+# IDE
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db

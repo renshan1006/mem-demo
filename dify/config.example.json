@@ -1,0 +1,5 @@
+{
+  "_comment": "Dify 智能体配置 — 复制为 config.json 并填入你的 API Key",
+  "api_key": "app-xxxxxxxxxxxxx",
+  "base_url": "https://api.dify.ai"
+}

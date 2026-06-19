@@ -1,0 +1,7 @@
+{
+  "_comment": "Redis 连接配置 — 使用前请修改",
+  "host": "localhost",
+  "port": 6379,
+  "db": 0,
+  "password": null
+}

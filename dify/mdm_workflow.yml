@@ -1,0 +1,607 @@
+app:
+  description: MDM 主数据管理智能清洗 — 跨源客户/商品实体匹配智能体
+  icon: 🧩
+  icon_background: '#1C64F2'
+  icon_type: emoji
+  mode: workflow
+  name: MDM-Entity-Matching-Agent
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/deepseek:0.0.17@f7a5c1d222d17ee419b17a80d6e4923838fe93788dc724a3af73fbc6990b3a32
+    version: null
+kind: app
+version: 0.6.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 50
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: llm
+      id: 1000000000001-source-1000000000002-target
+      source: '1000000000001'
+      sourceHandle: source
+      target: '1000000000002'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: 1000000000002-source-1000000000003-target
+      source: '1000000000002'
+      sourceHandle: source
+      target: '1000000000003'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: end
+      id: 1000000000003-source-1000000000004-target
+      source: '1000000000003'
+      sourceHandle: source
+      target: '1000000000004'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: 接收两条待匹配的客户或商品记录。
+        selected: false
+        title: 开始
+        type: start
+        variables:
+        - default: ''
+          hint: ''
+          label: entity_type
+          options: []
+          placeholder: ''
+          required: true
+          type: text-input
+          variable: entity_type
+        - default: ''
+          hint: ''
+          label: source_a
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: source_a
+        - default: ''
+          hint: ''
+          label: source_b
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: source_b
+        - default: ''
+          hint: ''
+          label: company_name_a
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: company_name_a
+        - default: ''
+          hint: ''
+          label: company_name_b
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: company_name_b
+        - default: ''
+          hint: ''
+          label: region_a
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: region_a
+        - default: ''
+          hint: ''
+          label: region_b
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: region_b
+        - default: ''
+          hint: ''
+          label: city_a
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: city_a
+        - default: ''
+          hint: ''
+          label: city_b
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: city_b
+        - default: ''
+          hint: ''
+          label: address_a
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: address_a
+        - default: ''
+          hint: ''
+          label: address_b
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: address_b
+        - default: ''
+          hint: ''
+          label: phone_a
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: phone_a
+        - default: ''
+          hint: ''
+          label: phone_b
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: phone_b
+        - default: ''
+          hint: ''
+          label: tax_id_a
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: tax_id_a
+        - default: ''
+          hint: ''
+          label: tax_id_b
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: tax_id_b
+        - default: ''
+          hint: ''
+          label: product_name_a
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: product_name_a
+        - default: ''
+          hint: ''
+          label: product_name_b
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: product_name_b
+        - default: ''
+          hint: ''
+          label: category_a
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: category_a
+        - default: ''
+          hint: ''
+          label: category_b
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: category_b
+        - default: ''
+          hint: ''
+          label: brand_a
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: brand_a
+        - default: ''
+          hint: ''
+          label: brand_b
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: brand_b
+        - default: ''
+          hint: ''
+          label: model_a
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: model_a
+        - default: ''
+          hint: ''
+          label: model_b
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: model_b
+        - default: ''
+          hint: ''
+          label: sku_a
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: sku_a
+        - default: ''
+          hint: ''
+          label: sku_b
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: sku_b
+        - default: ''
+          hint: ''
+          label: specification_a
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: specification_a
+        - default: ''
+          hint: ''
+          label: specification_b
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: specification_b
+        - default: ''
+          hint: ''
+          label: upc_a
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: upc_a
+        - default: ''
+          hint: ''
+          label: upc_b
+          options: []
+          placeholder: ''
+          required: false
+          type: text-input
+          variable: upc_b
+      height: 865
+      id: '1000000000001'
+      position:
+        x: 80
+        y: 200
+      positionAbsolute:
+        x: 80
+        y: 200
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: LLM 根据客户/商品规则判断两条记录是否为同一实体。
+        model:
+          completion_params:
+            temperature: 0.1
+          mode: chat
+          name: deepseek-v4-flash
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+          role: system
+          text: '你是一个主数据管理（MDM）专家，负责判断两个业务系统中的记录是否为同一实体。
+
+
+            ## 客户匹配规则（按优先级）：
+
+            1. 税号一致 → 高度确定为同一实体
+
+            2. 电话（去格式）一致 → 强信号
+
+            3. 公司名语义匹配：处理中英文混用、后缀差异、地名变体
+
+            4. 同地址/同城 > 异地
+
+            5. 跨省同名大概率不同实体（分公司除外）
+
+
+            ## 商品匹配规则（按优先级）：
+
+            1. SKU 非空且一致 → 同一商品；SKU 都有值但不同 → 不同商品变体
+
+            2. UPC 条码一致 → 同一商品；条码都非空但不同 → 不同商品
+
+            3. 商品名语义匹配 + 品牌/型号联合判断
+
+            4. 跨品类不可能是同一商品
+
+
+            ## 决策阈值：
+
+            - confidence >= 0.85 → merge（自动合并）
+
+            - confidence 0.65-0.84 → review（人工审核）
+
+            - confidence < 0.65 → no_match（不同实体）
+
+
+            ## 输出格式（严格 JSON，不要包含 ``` 代码块标记）：
+
+            {"decision":"merge|review|no_match","confidence":0.85,"reasoning":"简短推理","signals":{"tax_id_match":false,"phone_match":false,"sku_match":false,"upc_match":false,"name_semantic_similarity":0.9,"same_region_or_category":true}}
+
+            '
+        - id: b2c3d4e5-f6a7-8901-bcde-f12345678901
+          role: user
+          text: '请判断以下两条 {{#1000000000001.entity_type#}} 记录是否为同一实体。
+
+
+            【记录 A - {{#1000000000001.source_a#}}】
+
+            {% if #1000000000001.entity_type# == "customer" %}
+
+            - 公司名称：{{#1000000000001.company_name_a#}}
+
+            - 地区：{{#1000000000001.region_a#}}
+
+            - 城市：{{#1000000000001.city_a#}}
+
+            - 地址：{{#1000000000001.address_a#}}
+
+            - 电话：{{#1000000000001.phone_a#}}
+
+            - 税号：{{#1000000000001.tax_id_a#}}
+
+            {% else %}
+
+            - 商品名：{{#1000000000001.product_name_a#}}
+
+            - 品类：{{#1000000000001.category_a#}}
+
+            - 品牌：{{#1000000000001.brand_a#}}
+
+            - 型号：{{#1000000000001.model_a#}}
+
+            - SKU：{{#1000000000001.sku_a#}}
+
+            - 规格：{{#1000000000001.specification_a#}}
+
+            - 条码：{{#1000000000001.upc_a#}}
+
+            {% endif %}
+
+
+            【记录 B - {{#1000000000001.source_b#}}】
+
+            {% if #1000000000001.entity_type# == "customer" %}
+
+            - 公司名称：{{#1000000000001.company_name_b#}}
+
+            - 地区：{{#1000000000001.region_b#}}
+
+            - 城市：{{#1000000000001.city_b#}}
+
+            - 地址：{{#1000000000001.address_b#}}
+
+            - 电话：{{#1000000000001.phone_b#}}
+
+            - 税号：{{#1000000000001.tax_id_b#}}
+
+            {% else %}
+
+            - 商品名：{{#1000000000001.product_name_b#}}
+
+            - 品类：{{#1000000000001.category_b#}}
+
+            - 品牌：{{#1000000000001.brand_b#}}
+
+            - 型号：{{#1000000000001.model_b#}}
+
+            - SKU：{{#1000000000001.sku_b#}}
+
+            - 规格：{{#1000000000001.specification_b#}}
+
+            - 条码：{{#1000000000001.upc_b#}}
+
+            {% endif %}
+
+
+            请按照系统提示的规则判断并输出 JSON。
+
+            '
+        selected: false
+        title: LLM 语义匹配
+        type: llm
+        vision:
+          enabled: false
+      height: 133
+      id: '1000000000002'
+      position:
+        x: 405
+        y: 200
+      positionAbsolute:
+        x: 405
+        y: 200
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        code: "import json\nimport re\n\ndef extract_json(text: str) -> str:\n   \
+          \ \"\"\"从 LLM 输出中提取 JSON（支持嵌套对象）\"\"\"\n    text = text.strip()\n    # 去掉\
+          \ markdown 代码块\n    text = re.sub(r'```(?:json)?\\s*', '', text)\n    text\
+          \ = re.sub(r'\\s*```', '', text)\n    # 找到第一个 { 和对应的 }\n    start = text.find('{')\n\
+          \    if start == -1:\n        return ''\n    depth = 0\n    for i in range(start,\
+          \ len(text)):\n        if text[i] == '{':\n            depth += 1\n    \
+          \    elif text[i] == '}':\n            depth -= 1\n            if depth\
+          \ == 0:\n                return text[start:i + 1]\n    return ''\n\ndef\
+          \ main(llm_output: str) -> dict:\n    json_str = extract_json(llm_output)\n\
+          \    if not json_str:\n        return {\"decision\": \"review\", \"confidence\"\
+          : 0.5, \"reasoning\": \"LLM 输出中未找到 JSON\", \"signals\": {}}\n    try:\n\
+          \        result = json.loads(json_str)\n    except json.JSONDecodeError:\n\
+          \        return {\"decision\": \"review\", \"confidence\": 0.5, \"reasoning\"\
+          : \"JSON 解析失败: \" + json_str[:100], \"signals\": {}}\n    decision = result.get(\"\
+          decision\", \"review\")\n    if decision not in (\"merge\", \"review\",\
+          \ \"no_match\"):\n        decision = \"review\"\n    return {\n        \"\
+          decision\": decision,\n        \"confidence\": round(float(result.get(\"\
+          confidence\", 0.5)), 4),\n        \"reasoning\": str(result.get(\"reasoning\"\
+          , \"\")),\n        \"signals\": result.get(\"signals\", {})\n    }\n"
+        code_language: python3
+        desc: 解析 LLM 输出的 JSON 字符串，提取决策、置信度和理由。
+        outputs:
+          confidence:
+            children: null
+            type: number
+          decision:
+            children: null
+            type: string
+          reasoning:
+            children: null
+            type: string
+          signals:
+            children: null
+            type: object
+        selected: false
+        title: 解析 JSON
+        type: code
+        variables:
+        - value_selector:
+          - '1000000000002'
+          - text
+          variable: llm_output
+      height: 97
+      id: '1000000000003'
+      position:
+        x: 728
+        y: 200
+      positionAbsolute:
+        x: 728
+        y: 200
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: 输出匹配决策结果。
+        outputs:
+        - value_selector:
+          - '1000000000003'
+          - decision
+          value_type: string
+          variable: decision
+        - value_selector:
+          - '1000000000003'
+          - confidence
+          value_type: number
+          variable: confidence
+        - value_selector:
+          - '1000000000003'
+          - reasoning
+          value_type: string
+          variable: reasoning
+        - value_selector:
+          - '1000000000003'
+          - signals
+          value_type: object
+          variable: signals
+        selected: false
+        title: 结束
+        type: end
+      height: 195
+      id: '1000000000004'
+      position:
+        x: 1052
+        y: 200
+      positionAbsolute:
+        x: 1052
+        y: 200
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    viewport:
+      x: -281.5
+      y: 272.5
+      zoom: 1
+  rag_pipeline_variables: []
