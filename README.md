@@ -19,7 +19,7 @@
 - Python 3.9 或以上
 - 网络（首次运行需下载 Embedding 模型，约 1.3 GB）
 - 约 3 GB 磁盘空间
-- Dify 账号（LLM 增强用，需注册 https://cloud.dify.ai）
+- Dify 账号（LLM 增强用）
 
 ### 第一步：下载项目 & 安装依赖
 
