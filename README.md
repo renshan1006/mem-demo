@@ -19,7 +19,7 @@
 - Python 3.9 或以上
 - 网络（首次运行需下载 Embedding 模型，约 1.3 GB）
 - 约 3 GB 磁盘空间
-- Dify 账号（可选，LLM 增强用）
+- Dify 账号（LLM 增强用，需注册 https://cloud.dify.ai）
 
 ### 第一步：下载项目 & 安装依赖
 
@@ -38,7 +38,7 @@ python generate_dataset.py
 
 运行后 `data/` 目录下会多出 5 个 CSV 文件（共 6,200 条模拟数据）。这些数据都是代码生成的假数据，不涉及真实隐私。
 
-### 第三步：运行匹配管道
+### 第三步：运行匹配管道（模型下载）
 
 ```bash
 python mdm_pipeline.py
@@ -47,16 +47,22 @@ python finalize.py customer
 python finalize.py product
 ```
 
-首次运行时，`mdm_pipeline.py` 会自动下载 Embedding 模型（`bge-large-zh-v1.5`，约 1.3 GB），下载需要几分钟。下载完后缓存到 `.model_cache/` 目录，以后不再需要下载。
+`mdm_pipeline.py` 首次运行时会自动下载 Embedding 模型 `bge-large-zh-v1.5`（约 1.3 GB），下载需要几分钟。下载完成后缓存到 `.model_cache/` 目录，后续运行不再下载。
 
-模型有两种运行模式：
+**必须下载成功**，否则匹配效果会大打折扣：
 
-| 模式 | 触发条件 | 效果 | 审核队列大小 |
-|------|---------|------|:----------:|
-| Embedding 模式 | 模型下载成功 | AI 语义理解名称，能识别"Alpha" = "阿尔法" | 约 240 条 |
-| 回退模式 | 模型下载失败或网络不通 | 用编辑距离做名称比对 | 约 2,000 条 |
+| 状态 | 审核队列 | 匹配效果 |
+|------|:------:|------|
+| 模型下载成功 | 约 240 条 | 名称语义理解，能识别"Alpha" = "阿尔法" |
+| 模型下载失败 | 约 2,000 条 | 仅用编辑距离，中英混用、缩写等场景效果差 |
 
-终端看到 `模型加载完成` 即为 Embedding 模式，看到 `模型加载失败，回退到编辑距离匹配` 即为回退模式。两种模式都能正常运行，网络恢复后重新运行 `python mdm_pipeline.py` 即可切换到 Embedding 模式。
+**如何判断是否成功**：终端出现 `模型加载完成` 且 `Embedding 完成，耗时 XX 秒` 即为成功。
+
+**下载失败怎么办**：本项目已配置国内镜像 `hf-mirror.com`，无需科学上网。如果仍然下载失败：
+
+1. 检查网络连接，确保能访问 https://hf-mirror.com
+2. 尝试手动下载模型放到 `.model_cache/` 目录（模型地址：`BAAI/bge-large-zh-v1.5`）
+3. 或使用 `HF_ENDPOINT` 环境变量指定其他镜像：`set HF_ENDPOINT=https://你的镜像地址`
 
 ### 第四步：启动审核界面
 
@@ -67,7 +73,7 @@ python run_streamlit.py run streamlit_app.py
 
 浏览器打开 http://localhost:8501。
 
-### 第五步（可选）：阈值优化
+### 第五步：阈值优化
 
 ```bash
 cd scripts
@@ -82,7 +88,7 @@ python finalize.py customer
 python finalize.py product
 ```
 
-### 第六步（可选）：Dify 网页版 LLM 增强
+### 第六步：Dify LLM 增强
 
 Dify 是一个可视化的 LLM 工作流平台，本系统用它来做**匹配候选对的二次判断**——规则打分放入审核队列的模糊对，交给 LLM 做更精准的语义推理。
 
@@ -157,7 +163,7 @@ python dify_enrich.py product
 
 > 详细图文教程：[dify/README.md](dify/README.md)
 
-### 第七步（可选）：数据迁移到数据库
+### 第七步：数据迁移到数据库
 
 ```bash
 # SQLite
