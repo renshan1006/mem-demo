@@ -12,16 +12,14 @@
 - **黄金记录生成**：UnionFind 聚类合并，自动选择最完整记录
 - **阈值反馈回训**：基于审核日志 + 真值标签自动优化匹配阈值
 
-## 快速开始（从小白到跑通，跟着做就行）
+## 快速开始
 
-### 你电脑上需要有的东西
+### 环境需要
 
-| 需要 | 怎么检查 | 没有的话去哪装 |
-|------|---------|-------------|
-| Python 3.9 或更新 | 终端输入 `python --version` | https://python.org 下载 |
-| 网络（首次运行） | 能打开网页就行 | — |
-| 约 3 GB 磁盘空间 | 模型 1.3GB + 数据文件 ~100MB | — |
-| Dify 账号（可选） | 见下文 | https://cloud.dify.ai 免费注册 |
+- Python 3.9 或以上
+- 网络（首次运行需下载 Embedding 模型，约 1.3 GB）
+- 约 3 GB 磁盘空间
+- Dify 账号（可选，LLM 增强用）
 
 ### 第一步：下载项目 & 安装依赖
 
@@ -30,8 +28,6 @@ git clone <repo-url>
 cd mdm-demo
 pip install -r requirements.txt
 ```
-
-这一步会安装 pandas、numpy、streamlit、sentence-transformers 等 Python 包。如果报错，检查 pip 是否最新：`pip install --upgrade pip`
 
 ### 第二步：生成数据集
 
@@ -42,7 +38,7 @@ python generate_dataset.py
 
 运行后 `data/` 目录下会多出 5 个 CSV 文件（共 6,200 条模拟数据）。这些数据都是代码生成的假数据，不涉及真实隐私。
 
-### 第三步：运行匹配管道（关键步骤 ⚠️）
+### 第三步：运行匹配管道
 
 ```bash
 python mdm_pipeline.py
@@ -51,37 +47,27 @@ python finalize.py customer
 python finalize.py product
 ```
 
-**首次运行时**，`mdm_pipeline.py` 会自动从网上下载 AI 模型（`bge-large-zh-v1.5`，约 1.3 GB），下载需要几分钟。下载完后会缓存到 `.model_cache/` 目录，以后就不用再下了。
+首次运行时，`mdm_pipeline.py` 会自动下载 Embedding 模型（`bge-large-zh-v1.5`，约 1.3 GB），下载需要几分钟。下载完后缓存到 `.model_cache/` 目录，以后不再需要下载。
 
-**模型有两种运行模式：**
+模型有两种运行模式：
 
 | 模式 | 触发条件 | 效果 | 审核队列大小 |
 |------|---------|------|:----------:|
-| 🟢 **Embedding 模式** | 模型下载成功 | AI 语义理解名称，能识别"Alpha" = "阿尔法" | 约 240 条 |
-| 🟡 **回退模式** | 模型下载失败 / 网络不通 | 用编辑距离做名称比对，准确率稍低 | 约 2,000 条 |
+| Embedding 模式 | 模型下载成功 | AI 语义理解名称，能识别"Alpha" = "阿尔法" | 约 240 条 |
+| 回退模式 | 模型下载失败或网络不通 | 用编辑距离做名称比对 | 约 2,000 条 |
 
-> 💡 **怎么知道我在哪种模式下？** 看终端输出：如果看到 `模型加载完成` 就是 Embedding 模式；如果看到 `模型加载失败，回退到编辑距离匹配` 就是回退模式。两种都能跑，只是效果有差异。网络恢复后重新运行 `python mdm_pipeline.py` 就会自动重新下载模型切换到 Embedding 模式。
+终端看到 `模型加载完成` 即为 Embedding 模式，看到 `模型加载失败，回退到编辑距离匹配` 即为回退模式。两种模式都能正常运行，网络恢复后重新运行 `python mdm_pipeline.py` 即可切换到 Embedding 模式。
 
 ### 第四步：启动审核界面
 
 ```bash
-cd ..   # 回到项目根目录
-python run_streamlit.py run streamlit_app.py
-```
-
-浏览器打开 **http://localhost:8501**，你会看到一个 5 个标签页的审核系统。
-
-### 3. 启动审核界面
-
-```bash
-# 回到项目根目录
 cd ..
 python run_streamlit.py run streamlit_app.py
 ```
 
-浏览器打开 http://localhost:8501
+浏览器打开 http://localhost:8501。
 
-### 4.（可选）阈值优化
+### 第五步（可选）：阈值优化
 
 ```bash
 cd scripts
@@ -96,7 +82,7 @@ python finalize.py customer
 python finalize.py product
 ```
 
-### 5.（可选）Dify 网页版 LLM 增强
+### 第六步（可选）：Dify 网页版 LLM 增强
 
 Dify 是一个可视化的 LLM 工作流平台，本系统用它来做**匹配候选对的二次判断**——规则打分放入审核队列的模糊对，交给 LLM 做更精准的语义推理。
 
@@ -171,7 +157,7 @@ python dify_enrich.py product
 
 > 详细图文教程：[dify/README.md](dify/README.md)
 
-### 6.数据迁移到数据库
+### 第七步（可选）：数据迁移到数据库
 
 ```bash
 # SQLite
@@ -306,7 +292,7 @@ mdm-demo/
 | 总人工审核量 | 3,473 | 466 | **272** |
 | 人工审核减少 | — | 87% | **92%** |
 
-## 常见问题（小白必看）
+## 常见问题
 
 **Q: 运行 `mdm_pipeline.py` 很慢 / 卡住了？**
 A: 正常现象。第一次运行需要下载 AI 模型（约 1.3 GB），需要几分钟。进度条会显示 `Batches: 30%|███ | 10/33` 之类的。下载完就行了，以后不用再下。
