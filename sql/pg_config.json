@@ -1,8 +1,8 @@
 {
   "_comment": "PostgreSQL 连接配置 — 使用前请修改",
-  "host": "localhost",
+  "host": "127.0.0.1",
   "port": 5432,
   "database": "mdm_db",
-  "user": "mdm_user",
-  "password": "your_password"
+  "user": "postgres",
+  "password": "1234"
 }

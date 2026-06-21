@@ -113,6 +113,9 @@ STATUS_COLOR = {
     "合并": "success",
     "不合并": "neutral",
     "保留待定": "warn",
+    "高": "success",
+    "中": "warn",
+    "低": "neutral",
 }
 
 
@@ -214,11 +217,11 @@ def score_to_confidence(score: float) -> tuple[str, str, str]:
     低分 < 0.65: 低置信度 → 倾向不合并
     """
     if score >= 0.80:
-        return "高", "#38a169", "🟢"
+        return "高", "#34D399", "🟢"
     elif score >= 0.65:
-        return "中", "#e69148", "🟡"
+        return "中", "#FBBF24", "🟡"
     else:
-        return "低", "#e53e3e", "🔴"
+        return "低", "#F472B6", "🔴"
 
 
 def esc(text) -> str:
@@ -239,162 +242,409 @@ def _md(html: str) -> None:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# CSS 样式（暗色主题）
+# CSS 样式（Playful Geometric 设计系统）
 # ═══════════════════════════════════════════════════════════════════════════════
 
 CSS = """
 <style>
-  /* ── 全局 ── */
-  body { background: #0d0d12; }
-  .stApp { color-scheme: dark; }
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
-  /* ── 通用卡片 ── */
-  .card {
-    background: rgba(26, 26, 36, 0.92);
-    border: 1px solid #2c2c3a;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.28);
-    margin-bottom: 14px;
+  /* ═══════════════════════════════════════════════════════════════════════════
+     CSS VARIABLES (Design Tokens)
+     ═══════════════════════════════════════════════════════════════════════════ */
+  :root {
+    --bg: #FFFDF5;
+    --fg: #1E293B;
+    --muted: #F1F5F9;
+    --muted-fg: #64748B;
+    --accent: #8B5CF6;
+    --accent-hover: #7C3AED;
+    --secondary: #F472B6;
+    --tertiary: #FBBF24;
+    --quaternary: #34D399;
+    --border: #E2E8F0;
+    --border-dark: #1E293B;
+    --card: #FFFFFF;
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-full: 9999px;
+    --shadow: 4px 4px 0px 0px #1E293B;
+    --shadow-hover: 6px 6px 0px 0px #1E293B;
+    --shadow-active: 2px 2px 0px 0px #1E293B;
+    --bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .card-sm { padding: 14px; }
 
-  /* ── 页头 ── */
+  /* ═══════════════════════════════════════════════════════════════════════════
+     GLOBAL
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .stApp {
+    background: var(--bg);
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    color: var(--fg);
+  }
+  .stMain {
+    background-image: radial-gradient(circle, #CBD5E1 1.2px, transparent 1.2px);
+    background-size: 22px 22px;
+  }
+  /* Top-right decorative blob */
+  .stMain::before {
+    content: '';
+    position: fixed; top: -120px; right: -100px;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: rgba(139, 92, 246, 0.04);
+    border: 3px solid rgba(139, 92, 246, 0.08);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     TYPOGRAPHY
+     ═══════════════════════════════════════════════════════════════════════════ */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', system-ui, sans-serif !important;
+    font-weight: 700 !important;
+    color: var(--fg) !important;
+    letter-spacing: -0.02em;
+  }
+  h3 { font-size: 1.25rem !important; }
+  p, div, span, label, input, textarea, select, button, td, th, li, a {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     CARDS — "Sticker" cards with bouncy hover
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .card {
+    background: var(--card);
+    border: 2px solid var(--border-dark);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 14px;
+    transition: transform 0.3s var(--bounce), box-shadow 0.3s var(--bounce);
+    animation: card-enter 0.5s var(--bounce) both;
+    position: relative;
+  }
+  .card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: rotate(-0.5deg) scale(1.01);
+  }
+  .card-sm { padding: 14px; border-radius: 12px; }
+
+  /* Staggered card entrance */
+  .card:nth-child(1) { animation-delay: 0.05s; }
+  .card:nth-child(2) { animation-delay: 0.1s; }
+  .card:nth-child(3) { animation-delay: 0.15s; }
+  .card:nth-child(4) { animation-delay: 0.2s; }
+  .card:nth-child(5) { animation-delay: 0.25s; }
+
+  /* ── Decorative card variants ── */
+  .card-accent { border-color: var(--accent); box-shadow: 4px 4px 0px 0px var(--accent); }
+  .card-accent:hover { box-shadow: 6px 6px 0px 0px var(--accent); }
+  .card-pink { border-color: var(--secondary); box-shadow: 4px 4px 0px 0px var(--secondary); }
+  .card-pink:hover { box-shadow: 6px 6px 0px 0px var(--secondary); }
+  .card-amber { border-color: var(--tertiary); box-shadow: 4px 4px 0px 0px var(--tertiary); }
+  .card-amber:hover { box-shadow: 6px 6px 0px 0px var(--tertiary); }
+  .card-emerald { border-color: var(--quaternary); box-shadow: 4px 4px 0px 0px var(--quaternary); }
+  .card-emerald:hover { box-shadow: 6px 6px 0px 0px var(--quaternary); }
+
+  /* ── Blob-radius card ── */
+  .card-blob { border-radius: var(--radius-lg) 8px var(--radius-lg) 8px; }
+
+  /* ── Floating icon circle (top-right corner) ── */
+  .card-icon-circle {
+    width: 42px; height: 42px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    border: 2px solid var(--border-dark);
+    position: absolute; top: -21px; right: 16px;
+    box-shadow: 2px 2px 0px 0px var(--border-dark);
+    z-index: 1;
+  }
+  .card-icon-circle.violet { background: var(--accent); }
+  .card-icon-circle.pink { background: var(--secondary); }
+  .card-icon-circle.amber { background: var(--tertiary); }
+  .card-icon-circle.emerald { background: var(--quaternary); }
+
+  /* ── Sidebar card (compact) ── */
+  .sidebar-card {
+    background: var(--card); border: 2px solid var(--border-dark);
+    border-radius: var(--radius-md); padding: 14px 12px 12px 12px;
+    position: relative; margin-top: 20px;
+    transition: transform 0.25s var(--bounce), box-shadow 0.25s var(--bounce);
+  }
+  .sidebar-card-accent { border-color: var(--accent); box-shadow: 3px 3px 0px 0px var(--accent); }
+  .sidebar-card-accent:hover { box-shadow: 5px 5px 0px 0px var(--accent); transform: translateY(-1px); }
+  .sidebar-card-emerald { border-color: var(--quaternary); box-shadow: 3px 3px 0px 0px var(--quaternary); }
+  .sidebar-card-emerald:hover { box-shadow: 5px 5px 0px 0px var(--quaternary); transform: translateY(-1px); }
+  .sidebar-card-pink { border-color: var(--secondary); box-shadow: 3px 3px 0px 0px var(--secondary); }
+  .sidebar-card-pink:hover { box-shadow: 5px 5px 0px 0px var(--secondary); transform: translateY(-1px); }
+
+  /* ── Sidebar icon circle (smaller) ── */
+  .sidebar-icon {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    border: 2px solid var(--border-dark);
+    position: absolute; top: -16px; right: 10px;
+    box-shadow: 2px 2px 0px 0px var(--border-dark);
+    z-index: 1;
+  }
+  .sidebar-icon.violet { background: var(--accent); }
+  .sidebar-icon.pink { background: var(--secondary); }
+  .sidebar-icon.amber { background: var(--tertiary); }
+  .sidebar-icon.emerald { background: var(--quaternary); }
+
+  /* ── Sidebar metric text (compact) ── */
+  .sidebar-metric-val {
+    font-family: 'Outfit', system-ui, sans-serif;
+    font-size: 20px; font-weight: 800; color: var(--fg);
+    line-height: 1.2;
+  }
+  .sidebar-metric-lbl {
+    font-size: 11px; color: var(--muted-fg); font-weight: 500;
+    margin-top: 2px;
+  }
+  .sidebar-metric-sub {
+    font-size: 10px; color: #94A3B8; margin-top: 2px;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     HERO / PAGE HEADER
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .hero-section {
+    position: relative;
+    padding: 28px 0 8px 0;
+  }
   .page-title {
-    font-size: 26px; font-weight: 700; color: #f0f0f4;
-    margin: 0 0 4px 0;
+    font-family: 'Outfit', system-ui, sans-serif;
+    font-size: 30px; font-weight: 800; color: var(--fg);
+    margin: 0 0 6px 0;
+    position: relative; display: inline-block;
+  }
+  .page-title::after {
+    content: '';
+    position: absolute;
+    bottom: -6px; left: 0; right: 0;
+    height: 4px; border-radius: 2px;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--accent) 0px, var(--accent) 12px,
+      var(--secondary) 12px, var(--secondary) 24px,
+      var(--tertiary) 24px, var(--tertiary) 36px,
+      var(--quaternary) 36px, var(--quaternary) 48px
+    );
   }
   .page-subtitle {
-    font-size: 13px; color: #6b6b80; margin: 0;
+    font-size: 13px; color: var(--muted-fg); margin: 0;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+  .hero-stats {
+    display: flex; gap: 24px; margin-top: 12px;
+  }
+  .hero-stat {
+    text-align: center;
+  }
+  .hero-stat-val {
+    font-family: 'Outfit', system-ui, sans-serif;
+    font-size: 22px; font-weight: 800; color: var(--fg);
+  }
+  .hero-stat-lbl {
+    font-size: 10px; color: var(--muted-fg);
+    text-transform: uppercase; letter-spacing: 0.05em;
   }
 
-  /* ── 指标数字 ── */
+  /* ═══════════════════════════════════════════════════════════════════════════
+     METRICS
+     ═══════════════════════════════════════════════════════════════════════════ */
   .metric-val {
-    font-size: 28px; font-weight: 700; color: #f0f0f4;
-    margin-bottom: 4px;
+    font-family: 'Outfit', system-ui, sans-serif;
+    font-size: 32px; font-weight: 800; color: var(--fg);
+    margin-bottom: 4px; line-height: 1.1;
   }
-  .metric-val.sm { font-size: 22px; }
+  .metric-val.sm { font-size: 24px; }
   .metric-lbl {
-    font-size: 11px; color: #9494a8; letter-spacing: 0.05em;
-    text-transform: uppercase;
+    font-size: 11px; color: var(--muted-fg); letter-spacing: 0.06em;
+    text-transform: uppercase; font-weight: 600;
   }
   .metric-sub {
-    font-size: 12px; color: #6b6b80; margin-top: 4px;
+    font-size: 12px; color: #94A3B8; margin-top: 4px;
   }
 
-  /* ── 进度条 ── */
+  /* ═══════════════════════════════════════════════════════════════════════════
+     PROGRESS BARS
+     ═══════════════════════════════════════════════════════════════════════════ */
   .progress-track {
-    width: 100%; height: 8px; border-radius: 999px;
-    background: #1f1f29; overflow: hidden; margin-top: 8px;
+    width: 100%; height: 12px; border-radius: var(--radius-full);
+    background: var(--border); overflow: hidden; margin-top: 8px;
+    border: 2px solid var(--border-dark);
   }
   .progress-fill {
-    height: 100%; border-radius: 999px;
-    background: linear-gradient(90deg, #2b6de0, #4d7ff7);
-    transition: width 0.3s ease;
+    height: 100%; border-radius: var(--radius-full);
+    background: var(--accent);
+    transition: width 0.6s var(--bounce);
   }
-  .progress-fill.high { background: linear-gradient(90deg, #38a169, #48bb78); }
-  .progress-fill.mid  { background: linear-gradient(90deg, #d69e2e, #e69148); }
-  .progress-fill.low  { background: linear-gradient(90deg, #e53e3e, #fc8181); }
+  .progress-fill.high { background: var(--quaternary); }
+  .progress-fill.mid  { background: var(--tertiary); }
+  .progress-fill.low  { background: var(--secondary); }
 
-  /* ── 评分仪表 ── */
+  /* ═══════════════════════════════════════════════════════════════════════════
+     SCORE GAUGE
+     ═══════════════════════════════════════════════════════════════════════════ */
   .score-gauge {
     display: flex; align-items: center; gap: 10px;
   }
   .score-ring {
-    width: 64px; height: 64px; border-radius: 50%;
+    width: 72px; height: 72px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 20px; font-weight: 700; color: #f0f0f4;
-    border: 4px solid #2c2c3a;
+    font-family: 'Outfit', system-ui, sans-serif;
+    font-size: 22px; font-weight: 700; color: var(--fg);
+    border: 3px solid var(--border-dark);
+    box-shadow: 3px 3px 0px 0px var(--border-dark);
+    background: var(--card);
   }
 
-  /* ── 网格 ── */
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+  /* ═══════════════════════════════════════════════════════════════════════════
+     GRIDS
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px; }
 
-  /* ── 对比卡片 ── */
+  /* ═══════════════════════════════════════════════════════════════════════════
+     COMPARE CARDS
+     ═══════════════════════════════════════════════════════════════════════════ */
   .compare-card {
-    background: rgba(255,255,255,0.025);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 14px; padding: 16px;
+    background: #F8FAFC;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md); padding: 18px;
+    transition: transform 0.3s var(--bounce), box-shadow 0.3s var(--bounce);
+  }
+  .compare-card:hover {
+    box-shadow: 4px 4px 0px 0px var(--border);
+    transform: translateY(-2px);
   }
   .compare-header {
     display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 14px;
+    margin-bottom: 14px; padding-bottom: 10px;
+    border-bottom: 2px dashed #CBD5E1;
   }
-  .compare-title { color: #f0f0f4; font-size: 14px; font-weight: 700; }
+  .compare-title {
+    font-family: 'Outfit', system-ui, sans-serif;
+    color: var(--fg); font-size: 15px; font-weight: 700;
+  }
   .compare-badge {
-    color: #c0c4dc; font-size: 11px;
-    background: rgba(255,255,255,0.06);
-    padding: 4px 10px; border-radius: 999px;
+    color: #475569; font-size: 11px;
+    background: #F1F5F9; padding: 4px 12px; border-radius: var(--radius-full);
+    border: 1px solid var(--border);
   }
   .compare-row {
     display: grid; grid-template-columns: 1fr 1.4fr; align-items: center;
-    gap: 6px 16px; padding: 8px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    gap: 6px 16px; padding: 9px 0;
+    border-bottom: 1px solid #F1F5F9;
   }
   .compare-row:last-child { border-bottom: none; }
   .compare-row.header {
-    font-size: 11px; color: #9494a8; letter-spacing: 0.06em;
+    font-size: 11px; color: var(--muted-fg); letter-spacing: 0.06em;
     text-transform: uppercase; padding-bottom: 8px;
-    border-bottom: 1px solid rgba(255,255,255,0.12);
+    border-bottom: 2px solid var(--border);
   }
-  .compare-label { font-size: 11px; color: #9494a8; }
+  .compare-label { font-size: 11px; color: var(--muted-fg); font-weight: 500; }
   .compare-value {
-    font-size: 13px; color: #f0f0f4; word-break: break-word;
-    text-align: right;
+    font-size: 13px; color: var(--fg); word-break: break-word;
+    text-align: right; font-weight: 500;
   }
   .compare-value.diff {
-    color: #f6ad55; font-weight: 600;
+    color: #D97706; font-weight: 700;
+    background: #FEF3C7; padding: 2px 8px; border-radius: 4px;
+    border: 1px solid var(--tertiary);
   }
-  .compare-value.match {
-    color: #68d391;
-  }
+  .compare-value.match { color: #059669; }
 
-  /* ── 审核表单 ── */
+  /* ═══════════════════════════════════════════════════════════════════════════
+     FORMS — Candy Buttons & Playful Inputs
+     ═══════════════════════════════════════════════════════════════════════════ */
   .form-section {
-    background: rgba(255,255,255,0.035);
-    border: 1px solid #2c2c3a;
-    border-radius: 12px; padding: 16px;
+    background: #F8FAFC;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md); padding: 18px;
   }
   .stRadio > div {
-    background: rgba(255,255,255,0.03) !important;
-    padding: 10px !important; border-radius: 12px !important;
-    border: 1px solid #2c2c3a !important;
+    background: #F8FAFC !important;
+    padding: 10px !important; border-radius: var(--radius-md) !important;
+    border: 2px solid var(--border) !important;
   }
-  .stRadio label { color: #f0f0f4 !important; }
+  .stRadio label {
+    color: var(--fg) !important;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+  }
   .stTextArea>div textarea {
     border-radius: 12px !important;
-    background: #1a1a24 !important;
-    color: #f0f0f4 !important;
-    border: 1px solid #2c2c3a !important;
+    background: var(--card) !important;
+    color: var(--fg) !important;
+    border: 2px solid var(--border) !important;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+    transition: all 0.25s var(--bounce) !important;
   }
+  .stTextArea>div textarea:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 4px 4px 0px 0px var(--accent) !important;
+    outline: none !important;
+  }
+
+  /* ── Candy Button (Primary) ── */
   .stButton>button {
-    border-radius: 12px !important; padding: 0.6rem 1.4rem !important;
-    background-color: #3672e0 !important; color: #fff !important;
-    border: 1px solid rgba(255,255,255,0.08) !important;
-    font-weight: 600 !important;
-    transition: all 0.15s ease !important;
+    border-radius: var(--radius-full) !important;
+    padding: 0.6rem 1.6rem !important;
+    background-color: var(--accent) !important;
+    color: #FFFFFF !important;
+    border: 2px solid var(--border-dark) !important;
+    font-weight: 700 !important;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+    box-shadow: var(--shadow) !important;
+    transition: all 0.25s var(--bounce) !important;
+    letter-spacing: 0.01em;
   }
   .stButton>button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 24px rgba(22,57,128,0.3);
+    transform: translate(-2px, -2px) !important;
+    box-shadow: var(--shadow-hover) !important;
+    background-color: var(--accent-hover) !important;
+  }
+  .stButton>button:active {
+    transform: translate(2px, 2px) !important;
+    box-shadow: var(--shadow-active) !important;
   }
   .stButton>button:disabled {
-    opacity: 0.4; transform: none; box-shadow: none;
+    opacity: 0.45; transform: none !important; box-shadow: var(--shadow) !important;
   }
 
-  /* ── 按钮变体 ── */
+  /* ── Secondary Button (transparent → yellow fill on hover) ── */
   .btn-skip>button {
     background-color: transparent !important;
-    border: 1px solid #3d3d52 !important;
+    color: var(--fg) !important;
+    border: 2px solid var(--border-dark) !important;
+    box-shadow: none !important;
+  }
+  .btn-skip>button:hover {
+    background-color: var(--tertiary) !important;
+    color: var(--fg) !important;
+    transform: translate(-2px, -2px) !important;
+    box-shadow: var(--shadow-hover) !important;
   }
   .btn-undo>button {
-    background-color: rgba(229,62,62,0.15) !important;
-    border: 1px solid rgba(229,62,62,0.3) !important;
+    background-color: #FEF2F2 !important;
+    color: #DC2626 !important;
+    border: 2px solid #FECACA !important;
+  }
+  .btn-undo>button:hover {
+    background-color: #FEE2E2 !important;
+    border-color: #FCA5A5 !important;
   }
 
-  /* ── 审核日志表格 ── */
+  /* ═══════════════════════════════════════════════════════════════════════════
+     TABLES
+     ═══════════════════════════════════════════════════════════════════════════ */
   .review-table {
     width: 100%; border-collapse: separate; border-spacing: 0 6px;
   }
@@ -402,93 +652,410 @@ CSS = """
     padding: 10px 12px; text-align: left; font-size: 12px;
   }
   .review-table th {
-    color: #9494a8; font-weight: 600; letter-spacing: 0.02em;
+    color: var(--muted-fg); font-weight: 600; letter-spacing: 0.03em;
+    text-transform: uppercase; font-size: 10px;
   }
   .review-table td {
-    background: rgba(255,255,255,0.035); color: #e0e0ec;
-    border-top: 1px solid rgba(255,255,255,0.04);
+    background: #F8FAFC; color: #334155;
+    border-top: 1px solid #F1F5F9;
   }
-  .review-table tr:hover td { background: rgba(255,255,255,0.07); }
+  .review-table td:first-child { border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
+  .review-table td:last-child { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+  .review-table tr:hover td { background: #EDE9FE; }
 
-  /* ── 徽章 ── */
+  /* ═══════════════════════════════════════════════════════════════════════════
+     BADGES
+     ═══════════════════════════════════════════════════════════════════════════ */
   .badge {
     display: inline-flex; align-items: center; gap: 4px;
-    border-radius: 999px; padding: 3px 10px;
+    border-radius: var(--radius-full); padding: 3px 12px;
     font-size: 11px; font-weight: 600;
+    border: 2px solid var(--border-dark);
   }
-  .badge-success { background: rgba(56,161,105,0.18); color: #9ae6b4; }
-  .badge-neutral  { background: rgba(148,148,168,0.18); color: #c7c9db; }
-  .badge-warn     { background: rgba(230,145,72,0.18); color: #fbd38d; }
+  .badge-success { background: #D1FAE5; color: #065F46; border-color: var(--quaternary); }
+  .badge-neutral { background: #F1F5F9; color: #475569; border-color: #CBD5E1; }
+  .badge-warn { background: #FEF3C7; color: #92400E; border-color: var(--tertiary); }
+  .badge-accent { background: #EDE9FE; color: #5B21B6; border-color: var(--accent); }
+  .badge-pink { background: #FCE7F3; color: #9D174D; border-color: var(--secondary); }
+  .badge-emerald { background: #D1FAE5; color: #065F46; border-color: var(--quaternary); }
+  .badge-amber { background: #FEF3C7; color: #92400E; border-color: var(--tertiary); }
 
-  /* ── 分页器 ── */
+  /* ═══════════════════════════════════════════════════════════════════════════
+     PAGINATION
+     ═══════════════════════════════════════════════════════════════════════════ */
   .pager {
     display: flex; justify-content: space-between; align-items: center;
-    margin-top: 14px; color: #9494a8; font-size: 12px;
+    margin-top: 14px; color: var(--muted-fg); font-size: 12px;
   }
   .pager-btn {
-    border: 1px solid #2c2c3a; background: transparent;
-    border-radius: 8px; color: #f0f0f4; padding: 6px 12px;
-    cursor: pointer; font-size: 12px;
+    border: 2px solid var(--border); background: var(--card);
+    border-radius: var(--radius-full); color: var(--fg); padding: 6px 14px;
+    cursor: pointer; font-size: 12px; font-weight: 600;
+    transition: all 0.25s var(--bounce);
   }
-  .pager-btn:hover { background: rgba(255,255,255,0.06); }
+  .pager-btn:hover {
+    background: #F8FAFC; border-color: #94A3B8;
+    transform: translateY(-1px);
+  }
 
-  /* ── 数据表格（队列预览） ── */
+  /* ═══════════════════════════════════════════════════════════════════════════
+     DATA TABLE (Queue Preview)
+     ═══════════════════════════════════════════════════════════════════════════ */
   .data-table {
     width: 100%; border-collapse: separate; border-spacing: 0 4px;
   }
   .data-table th {
-    color: #9494a8; font-size: 11px; font-weight: 600;
-    letter-spacing: 0.03em; padding: 8px 10px; text-align: left;
-    position: sticky; top: 0; background: #1a1a24; z-index: 1;
+    color: var(--muted-fg); font-size: 10px; font-weight: 600;
+    letter-spacing: 0.04em; padding: 8px 10px; text-align: left;
+    position: sticky; top: 0; background: var(--bg); z-index: 1;
+    text-transform: uppercase;
   }
   .data-table td {
-    padding: 8px 10px; font-size: 12px; color: #e0e0ec;
-    background: rgba(255,255,255,0.03);
-    border-top: 1px solid rgba(255,255,255,0.04);
+    padding: 8px 10px; font-size: 12px; color: #334155;
+    background: #F8FAFC; border-top: 1px solid #F1F5F9;
   }
-  .data-table tr:hover td { background: rgba(54,114,224,0.12); cursor: pointer; }
+  .data-table tr:hover td { background: #EDE9FE; cursor: pointer; }
   .data-table tr.reviewed td { opacity: 0.5; }
 
-  /* ── Radio Tab 导航样式 ── */
-  div[data-testid="stRadio"] > div[role="radiogroup"] {
-    gap: 4px;
-    background: rgba(26,26,36,0.6);
+  /* ── Queue row card style ── */
+  .queue-row {
+    background: var(--card);
+    border: 2px solid var(--border);
     border-radius: 12px;
-    padding: 4px;
-    display: flex;
-    flex-wrap: wrap;
-  }
-  div[data-testid="stRadio"] label {
-    border-radius: 10px;
-    color: #9494a8 !important;
-    font-size: 13px;
-    padding: 8px 16px;
-    transition: all 0.15s;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 12px;
+    transition: all 0.25s var(--bounce);
     cursor: pointer;
   }
-  div[data-testid="stRadio"] label:hover {
-    background: rgba(255,255,255,0.05);
+  .queue-row:hover {
+    border-color: var(--accent);
+    box-shadow: 3px 3px 0px 0px var(--accent);
+    transform: translateX(4px);
   }
-  div[data-testid="stRadio"] label:has(input:checked) {
-    background: rgba(54,114,224,0.2) !important;
-    color: #f0f0f4 !important;
+  .queue-row.reviewed { opacity: 0.55; }
+  .queue-row.reviewed:hover { border-color: var(--border); box-shadow: none; transform: none; }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     TAB NAVIGATION (Vertical Sidebar Nav) — Playful Geometric
+     ═══════════════════════════════════════════════════════════════════════════ */
+  [data-testid="stSidebar"] div[data-testid="stRadio"] > div[role="radiogroup"] {
+    gap: 6px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: none;
+  }
+  [data-testid="stSidebar"] div[data-testid="stRadio"] label {
+    border-radius: var(--radius-md);
+    color: var(--fg) !important;
+    font-size: 14px;
+    padding: 11px 16px;
+    transition: all 0.3s var(--bounce);
+    cursor: pointer;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    border: 2px solid transparent;
+    margin: 0;
+    position: relative;
+    background: #FAFAFA;
+  }
+  [data-testid="stSidebar"] div[data-testid="stRadio"] label:hover {
+    background: #F1F5F9;
+    border-color: var(--border);
+    transform: translateX(3px);
+    box-shadow: 2px 2px 0px 0px var(--border);
+  }
+  [data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) {
+    background: #EDE9FE !important;
+    color: var(--accent) !important;
+    font-weight: 700;
+    border-color: var(--border-dark);
+    box-shadow: 3px 3px 0px 0px var(--accent);
+    transform: translateX(2px);
+  }
+  /* 选中项左侧色条 */
+  [data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked)::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 8px; bottom: 8px;
+    width: 4px;
+    border-radius: 0 4px 4px 0;
+    background: var(--accent);
   }
 
-  /* ── 其他 ── */
+  /* ═══════════════════════════════════════════════════════════════════════════
+     OTHER STREAMLIT OVERRIDES
+     ═══════════════════════════════════════════════════════════════════════════ */
   .stSelectbox>div {
-    border-radius: 10px !important;
-    background: #1a1a24 !important;
-    border: 1px solid #2c2c3a !important;
+    border-radius: 12px !important;
+    background: var(--card) !important;
+    border: 2px solid var(--border) !important;
+    transition: all 0.25s var(--bounce) !important;
   }
-  .stSelectbox label { color: #9494a8 !important; font-size: 12px !important; }
-  .stSlider>div>div { color: #f0f0f4 !important; }
-  hr { border-color: #2c2c3a; margin: 16px 0; }
+  .stSelectbox>div:focus-within {
+    border-color: var(--accent) !important;
+    box-shadow: 4px 4px 0px 0px var(--accent) !important;
+  }
+  .stSelectbox label {
+    color: var(--muted-fg) !important; font-size: 12px !important;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+  }
+  .stSlider>div>div { color: var(--fg) !important; }
+  hr { border-color: var(--border); margin: 20px 0; border-width: 2px; }
   .entity-tag {
-    display: inline-block; padding: 4px 10px; border-radius: 6px;
+    display: inline-block; padding: 4px 14px; border-radius: var(--radius-full);
     font-size: 12px; font-weight: 600;
+    border: 2px solid var(--border-dark);
   }
-  .entity-tag.customer { background: rgba(54,114,224,0.2); color: #90b4f8; }
-  .entity-tag.product  { background: rgba(56,161,105,0.2); color: #9ae6b4; }
+  .entity-tag.customer { background: #EDE9FE; color: #5B21B6; border-color: var(--accent); }
+  .entity-tag.product { background: #D1FAE5; color: #065F46; border-color: var(--quaternary); }
+
+  /* ── Streamlit progress bar ── */
+  .stProgress > div > div {
+    background-color: var(--accent) !important;
+    border-radius: var(--radius-full) !important;
+  }
+  .stProgress > div {
+    background-color: var(--border) !important;
+    border-radius: var(--radius-full) !important;
+    border: 2px solid var(--border-dark);
+  }
+
+  /* ── Streamlit expander ── */
+  .streamlit-expanderHeader {
+    font-family: 'Outfit', system-ui, sans-serif !important;
+    font-weight: 700 !important;
+    color: var(--fg) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 12px !important;
+    transition: all 0.25s var(--bounce) !important;
+  }
+  .streamlit-expanderHeader:hover {
+    border-color: var(--accent) !important;
+  }
+
+  /* ── Streamlit metric widget ── */
+  [data-testid="stMetricValue"] {
+    font-family: 'Outfit', system-ui, sans-serif !important;
+    font-weight: 800 !important;
+    color: var(--fg) !important;
+  }
+  [data-testid="stMetricLabel"] {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+    color: var(--muted-fg) !important;
+  }
+
+  /* ── Streamlit form ── */
+  [data-testid="stForm"] {
+    border: 2px solid var(--border) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 16px !important;
+    background: #F8FAFC !important;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     ANIMATIONS
+     ═══════════════════════════════════════════════════════════════════════════ */
+  @keyframes card-enter {
+    0% { opacity: 0; transform: scale(0.92) translateY(12px); }
+    70% { transform: scale(1.02); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(-6px) rotate(3deg); }
+    75% { transform: translateY(4px) rotate(-3deg); }
+  }
+  @keyframes float-reverse {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(6px) rotate(-3deg); }
+    75% { transform: translateY(-4px) rotate(3deg); }
+  }
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-3deg); }
+    75% { transform: rotate(3deg); }
+  }
+  @keyframes pop-in {
+    0% { transform: scale(0); opacity: 0; }
+    70% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  @keyframes pulse-ring {
+    0%, 100% { box-shadow: 3px 3px 0px 0px var(--border-dark); }
+    50% { box-shadow: 5px 5px 0px 0px var(--accent); }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     DECORATIVE ELEMENTS
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .deco-circle {
+    border-radius: 50%; border: 2px solid var(--border-dark);
+    position: absolute; pointer-events: none; z-index: 0;
+  }
+
+  /* ── Confetti container ── */
+  .confetti-container {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0; overflow: hidden;
+  }
+  .confetti-piece {
+    position: absolute; border: 2px solid var(--border-dark); opacity: 0.65;
+  }
+  .confetti-piece:nth-child(1) {
+    top: 6%; left: 4%; width: 20px; height: 20px;
+    border-radius: 50%; background: var(--secondary);
+    animation: float 4.5s ease-in-out infinite;
+  }
+  .confetti-piece:nth-child(2) {
+    top: 10%; right: 6%; width: 16px; height: 16px;
+    background: var(--tertiary);
+    animation: float-reverse 5.5s ease-in-out infinite 0.5s;
+  }
+  .confetti-piece:nth-child(3) {
+    top: 18%; left: 10%; width: 0; height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 18px solid var(--quaternary);
+    background: transparent;
+    animation: float 3.8s ease-in-out infinite 1s;
+  }
+  .confetti-piece:nth-child(4) {
+    top: 4%; right: 12%; width: 18px; height: 18px;
+    border-radius: 4px; background: var(--accent);
+    animation: float-reverse 4.8s ease-in-out infinite 0.8s;
+  }
+  .confetti-piece:nth-child(5) {
+    top: 22%; left: 2%; width: 0; height: 0;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-bottom: 16px solid var(--secondary);
+    background: transparent;
+    animation: float 6s ease-in-out infinite 1.5s;
+  }
+  .confetti-piece:nth-child(6) {
+    top: 6%; right: 22%; width: 14px; height: 14px;
+    border-radius: 50%; background: var(--tertiary);
+    animation: float-reverse 4s ease-in-out infinite 2s;
+  }
+  .confetti-piece:nth-child(7) {
+    top: 12%; left: 18%; width: 22px; height: 10px;
+    border-radius: var(--radius-full); background: var(--accent);
+    animation: wiggle 4.5s ease-in-out infinite 0.3s;
+  }
+  .confetti-piece:nth-child(8) {
+    top: 26%; right: 4%; width: 0; height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-bottom: 22px solid var(--quaternary);
+    background: transparent;
+    animation: float 5s ease-in-out infinite 1.2s;
+  }
+
+  /* ── Squiggly divider ── */
+  .squiggle-divider {
+    height: 12px; margin: 10px 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'%3E%3Cpath d='M0,6 Q10,0 20,6 T40,6 T60,6 T80,6 T100,6 T120,6' fill='none' stroke='%238B5CF6' stroke-width='2.5'/%3E%3C/svg%3E") repeat-x;
+    background-size: 60px 12px;
+  }
+
+  /* ── Diagonal stripe pattern (for hero backgrounds) ── */
+  .bg-stripes {
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 8px,
+      rgba(139, 92, 246, 0.04) 8px,
+      rgba(139, 92, 246, 0.04) 10px
+    );
+  }
+
+  /* ── Dot accent ── */
+  .dot-accent {
+    display: inline-block; width: 8px; height: 8px;
+    border-radius: 50%; border: 2px solid var(--border-dark);
+    margin-right: 6px; vertical-align: middle;
+  }
+  .dot-accent.violet { background: var(--accent); }
+  .dot-accent.pink { background: var(--secondary); }
+  .dot-accent.amber { background: var(--tertiary); }
+  .dot-accent.emerald { background: var(--quaternary); }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     SIDEBAR
+     ═══════════════════════════════════════════════════════════════════════════ */
+  [data-testid="stSidebar"] {
+    background: var(--bg);
+    border-right: 2px solid var(--border-dark);
+  }
+  [data-testid="stSidebar"] .stSelectbox>div {
+    background: var(--card) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 12px !important;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     SECTION HEADER
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .section-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px; padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-header-icon {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; border: 2px solid var(--border-dark);
+    flex-shrink: 0;
+  }
+  .section-header-icon.violet { background: var(--accent); }
+  .section-header-icon.pink { background: var(--secondary); }
+  .section-header-icon.amber { background: var(--tertiary); }
+  .section-header-icon.emerald { background: var(--quaternary); }
+
+  .section-header-title {
+    font-family: 'Outfit', system-ui, sans-serif;
+    font-size: 18px; font-weight: 700; color: var(--fg);
+  }
+  .section-header-sub {
+    font-size: 12px; color: var(--muted-fg);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     ACCESSIBILITY: prefers-reduced-motion
+     ═══════════════════════════════════════════════════════════════════════════ */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    .card:hover { transform: none; }
+    .stButton>button:hover { transform: none !important; }
+    .queue-row:hover { transform: none; }
+    .sidebar-card:hover { transform: none; }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     RESPONSIVE
+     ═══════════════════════════════════════════════════════════════════════════ */
+  @media (max-width: 768px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .page-title { font-size: 22px; }
+    .card { padding: 14px; }
+    .hero-stats { gap: 12px; }
+    .hero-stat-val { font-size: 18px; }
+    .card-icon-circle { display: none; }
+    .sidebar-icon { display: none; }
+  }
 </style>
 """
 
@@ -615,8 +1182,8 @@ def render_log_table(log_df: pd.DataFrame, page_key: str, page_size: int = 10) -
         f"""
         <div class='card'>
           <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;'>
-            <span style='color:#f0f0f4;font-size:16px;font-weight:600;'>📋 审核记录</span>
-            <span style='color:#9494a8;font-size:12px;'>共 {total} 条</span>
+            <span style='color:#1E293B;font-size:16px;font-weight:600;'>📋 审核记录</span>
+            <span style='color:#64748B;font-size:12px;'>共 {total} 条</span>
           </div>
           <div style='max-height:500px;overflow-y:auto;'>
             <table class='review-table'>
@@ -656,7 +1223,16 @@ def render_log_table(log_df: pd.DataFrame, page_key: str, page_size: int = 10) -
 
 def render_dashboard(entity: str) -> None:
     """渲染仪表板 Tab"""
-    st.markdown("### 📊 匹配管道仪表板")
+    st.markdown(
+        """<div class='section-header'>
+          <div class='section-header-icon violet'>📊</div>
+          <div>
+            <div class='section-header-title'>匹配管道仪表板</div>
+            <div class='section-header-sub'>全局概览 · 实时统计 · 分数分布</div>
+          </div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
 
     queue_df = load_review_queue(entity)
     log_df = load_review_log(entity)
@@ -674,27 +1250,31 @@ def render_dashboard(entity: str) -> None:
 
     merge_rate = (merge_count / total_log * 100) if total_log > 0 else 0
 
-    # ── 顶部指标卡片 ──
+    # ── 顶部指标卡片（带浮动图标） ──
     _md(f"""\
     <div class='grid-4'>
-      <div class='card card-sm'>
+      <div class='card card-sm card-accent' style='margin-top:22px;'>
+        <div class='card-icon-circle violet'>📥</div>
         <div class='metric-val'>{fmt_num(total_queue)}</div>
-        <div class='metric-lbl'>📥 待审核候选对</div>
+        <div class='metric-lbl'>待审核候选对</div>
         <div class='metric-sub'>剩余 {remaining} 条未审核</div>
       </div>
-      <div class='card card-sm'>
+      <div class='card card-sm card-emerald' style='margin-top:22px;'>
+        <div class='card-icon-circle emerald'>✅</div>
         <div class='metric-val'>{fmt_num(total_log)}</div>
-        <div class='metric-lbl'>✅ 已审核记录</div>
+        <div class='metric-lbl'>已审核记录</div>
         <div class='metric-sub'>进度 {total_log/max(total_queue,1)*100:.1f}%</div>
       </div>
-      <div class='card card-sm'>
-        <div class='metric-val' style='color:#38a169;'>{merge_count}</div>
-        <div class='metric-lbl'>🔗 合并决策</div>
+      <div class='card card-sm card-emerald' style='margin-top:22px;'>
+        <div class='card-icon-circle emerald'>🔗</div>
+        <div class='metric-val' style='color:var(--quaternary);'>{merge_count}</div>
+        <div class='metric-lbl'>合并决策</div>
         <div class='metric-sub'>合并率 {merge_rate:.1f}%</div>
       </div>
-      <div class='card card-sm'>
-        <div class='metric-val' style='color:#e53e3e;'>{not_merge_count}</div>
-        <div class='metric-lbl'>❌ 不合并决策</div>
+      <div class='card card-sm card-pink' style='margin-top:22px;'>
+        <div class='card-icon-circle pink'>❌</div>
+        <div class='metric-val' style='color:var(--secondary);'>{not_merge_count}</div>
+        <div class='metric-lbl'>不合并决策</div>
         <div class='metric-sub'>待定 {pending_count} 条</div>
       </div>
     </div>\
@@ -705,20 +1285,21 @@ def render_dashboard(entity: str) -> None:
 
     with col1:
         _md(f"""\
-        <div class='card'>
-          <div style='color:#f0f0f4;font-size:14px;font-weight:600;margin-bottom:12px;'>
-            🔧 自动匹配管道指标
+        <div class='card' style='margin-top:22px;'>
+          <div class='card-icon-circle violet'>🔧</div>
+          <div style='color:var(--fg);font-size:14px;font-weight:600;margin-bottom:12px;margin-top:4px;'>
+            自动匹配管道指标
           </div>
-          <table style='width:100%;color:#e0e0ec;font-size:13px;'>
-            <tr><td style='padding:6px 0;color:#9494a8;'>总候选对数</td>
+          <table style='width:100%;color:#334155;font-size:13px;'>
+            <tr><td style='padding:6px 0;color:var(--muted-fg);'>总候选对数</td>
                 <td style='text-align:right;'><strong>{fmt_num(metrics.get("total_candidates", 0))}</strong></td></tr>
-            <tr><td style='padding:6px 0;color:#9494a8;'>自动合并 (≥0.80)</td>
-                <td style='text-align:right;color:#68d391;'><strong>{fmt_num(metrics.get("auto_merge_count", 0))}</strong></td></tr>
-            <tr><td style='padding:6px 0;color:#9494a8;'>需审核 (0.50-0.80)</td>
-                <td style='text-align:right;color:#f6ad55;'><strong>{fmt_num(metrics.get("review_count", 0))}</strong></td></tr>
-            <tr><td style='padding:6px 0;color:#9494a8;'>判定不同 (&lt;0.50)</td>
-                <td style='text-align:right;color:#fc8181;'><strong>{fmt_num(metrics.get("no_match_count", 0))}</strong></td></tr>
-            <tr><td style='padding:6px 0;color:#9494a8;'>审核队列中真匹配比例</td>
+            <tr><td style='padding:6px 0;color:var(--muted-fg);'>自动合并 (≥0.80)</td>
+                <td style='text-align:right;color:var(--quaternary);'><strong>{fmt_num(metrics.get("auto_merge_count", 0))}</strong></td></tr>
+            <tr><td style='padding:6px 0;color:var(--muted-fg);'>需审核 (0.50-0.80)</td>
+                <td style='text-align:right;color:var(--tertiary);'><strong>{fmt_num(metrics.get("review_count", 0))}</strong></td></tr>
+            <tr><td style='padding:6px 0;color:var(--muted-fg);'>判定不同 (&lt;0.50)</td>
+                <td style='text-align:right;color:var(--secondary);'><strong>{fmt_num(metrics.get("no_match_count", 0))}</strong></td></tr>
+            <tr><td style='padding:6px 0;color:var(--muted-fg);'>审核队列中真匹配比例</td>
                 <td style='text-align:right;'><strong>{metrics.get("review_true_ratio", 0):.1%}</strong></td></tr>
           </table>
         </div>\
@@ -726,20 +1307,21 @@ def render_dashboard(entity: str) -> None:
 
     with col2:
         _md(f"""\
-        <div class='card'>
-          <div style='color:#f0f0f4;font-size:14px;font-weight:600;margin-bottom:12px;'>
-            🏆 最终黄金记录
+        <div class='card' style='margin-top:22px;'>
+          <div class='card-icon-circle emerald'>🏆</div>
+          <div style='color:var(--fg);font-size:14px;font-weight:600;margin-bottom:12px;margin-top:4px;'>
+            最终黄金记录
           </div>
-          <table style='width:100%;color:#e0e0ec;font-size:13px;'>
-            <tr><td style='padding:6px 0;color:#9494a8;'>最终实体数</td>
-                <td style='text-align:right;'><strong style='font-size:22px;color:#f0f0f4;'>{fmt_num(final_metrics.get("final_entity_count", 0))}</strong></td></tr>
-            <tr><td style='padding:6px 0;color:#9494a8;'>自动合并对</td>
-                <td style='text-align:right;color:#68d391;'><strong>{fmt_num(final_metrics.get("auto_merge_pairs", 0))}</strong></td></tr>
-            <tr><td style='padding:6px 0;color:#9494a8;'>人工合并对</td>
-                <td style='text-align:right;color:#f6ad55;'><strong>{fmt_num(final_metrics.get("manual_merge_pairs", 0))}</strong></td></tr>
-            <tr><td style='padding:6px 0;color:#9494a8;'>总合并对</td>
+          <table style='width:100%;color:#334155;font-size:13px;'>
+            <tr><td style='padding:6px 0;color:var(--muted-fg);'>最终实体数</td>
+                <td style='text-align:right;'><strong style='font-size:22px;color:var(--fg);'>{fmt_num(final_metrics.get("final_entity_count", 0))}</strong></td></tr>
+            <tr><td style='padding:6px 0;color:var(--muted-fg);'>自动合并对</td>
+                <td style='text-align:right;color:var(--quaternary);'><strong>{fmt_num(final_metrics.get("auto_merge_pairs", 0))}</strong></td></tr>
+            <tr><td style='padding:6px 0;color:var(--muted-fg);'>人工合并对</td>
+                <td style='text-align:right;color:var(--tertiary);'><strong>{fmt_num(final_metrics.get("manual_merge_pairs", 0))}</strong></td></tr>
+            <tr><td style='padding:6px 0;color:var(--muted-fg);'>总合并对</td>
                 <td style='text-align:right;'><strong>{fmt_num(final_metrics.get("total_merge_pairs", 0))}</strong></td></tr>
-            <tr><td style='padding:6px 0;color:#9494a8;'>去重率</td>
+            <tr><td style='padding:6px 0;color:var(--muted-fg);'>去重率</td>
                 <td style='text-align:right;'><strong>{final_metrics.get("dedup_rate", "N/A")}</strong></td></tr>
           </table>
         </div>\
@@ -747,7 +1329,9 @@ def render_dashboard(entity: str) -> None:
 
     # ── 分数分布 ──
     if not queue_df.empty:
-        st.markdown("<div class='card'><div style='color:#f0f0f4;font-size:14px;font-weight:600;margin-bottom:12px;'>📈 审核队列分数分布</div></div>", unsafe_allow_html=True)
+        _md("""<div class='card' style='margin-top:22px;'>
+          <div class='card-icon-circle amber'>📈</div>
+          <div style='color:var(--fg);font-size:14px;font-weight:600;margin-bottom:12px;margin-top:4px;'>审核队列分数分布</div></div>""")
         scores = pd.to_numeric(queue_df["match_score"], errors="coerce").dropna()
         if len(scores) > 0:
             try:
@@ -760,30 +1344,30 @@ def render_dashboard(entity: str) -> None:
             fig.add_trace(go.Histogram(
                 x=scores,
                 nbinsx=30,
-                marker_color='#4d7ff7',
-                marker_line_color='rgba(255,255,255,0.1)',
+                marker_color='#8B5CF6',
+                marker_line_color='rgba(0,0,0,0.08)',
                 marker_line_width=1,
                 hovertemplate='分数区间: %{x:.3f}<br>数量: %{y}<extra></extra>',
             ))
             # 添加阈值线
-            for threshold, color, label in [(0.50, "#e53e3e", "低/中分界"), (0.80, "#38a169", "中/高分界")]:
+            for threshold, color, label in [(0.50, "#F472B6", "低/中分界"), (0.80, "#34D399", "中/高分界")]:
                 fig.add_vline(
                     x=threshold, line_dash="dash", line_color=color,
                     annotation_text=label, annotation_position="top",
                     opacity=0.7, line_width=1.5,
                 )
             fig.update_layout(
-                template="plotly_dark",
-                paper_bgcolor="rgba(26,26,36,0.92)",
-                plot_bgcolor="rgba(26,26,36,0.92)",
-                font=dict(color="#9494a8", size=11),
+                template="plotly_white",
+                paper_bgcolor="#FFFFFF",
+                plot_bgcolor="#F8FAFC",
+                font=dict(color="#64748B", size=11),
                 margin=dict(l=20, r=20, t=10, b=10),
                 height=280,
                 xaxis_title="匹配分数",
                 yaxis_title="候选对数量",
                 bargap=0.05,
             )
-            st.plotly_chart(fig, width="stretch")
+            st.plotly_chart(fig, use_container_width=True)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -792,7 +1376,16 @@ def render_dashboard(entity: str) -> None:
 
 def render_review_queue(entity: str) -> None:
     """渲染审核队列 Tab —— 可筛选、可点击跳转的数据表格"""
-    st.markdown("### 🔍 审核队列浏览器")
+    st.markdown(
+        """<div class='section-header'>
+          <div class='section-header-icon amber'>🔍</div>
+          <div>
+            <div class='section-header-title'>审核队列浏览器</div>
+            <div class='section-header-sub'>筛选 · 排序 · 快速跳转审核</div>
+          </div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
 
     queue_df = load_review_queue(entity)
     reviewed_pairs = get_reviewed_pairs(entity)
@@ -884,7 +1477,7 @@ def render_review_queue(entity: str) -> None:
     page_data = filtered.iloc[start:start + page_size]
 
     st.markdown(
-        f"<div style='color:#9494a8;font-size:12px;margin-bottom:8px;'>"
+        f"<div style='color:#64748B;font-size:12px;margin-bottom:8px;'>"
         f"显示 {start+1}-{min(start+page_size, total)} / 共 {total} 条"
         f"</div>",
         unsafe_allow_html=True,
@@ -910,32 +1503,32 @@ def render_review_queue(entity: str) -> None:
         col1, col2, col3, col4, col5, col6 = st.columns([3, 2, 1.5, 1.5, 1, 1.5])
         with col1:
             st.markdown(
-                f"<div style='font-size:12px;color:#f0f0f4;'>{esc(name_left)}</div>"
-                f"<div style='font-size:11px;color:#9494a8;'>{esc(name_right)}</div>",
+                f"<div style='font-size:12px;color:#1E293B;'>{esc(name_left)}</div>"
+                f"<div style='font-size:11px;color:#64748B;'>{esc(name_right)}</div>",
                 unsafe_allow_html=True,
             )
         with col2:
             region_or_cat = row.get("region_left" if entity == "customer" else "category_left", "")
             st.markdown(
-                f"<div style='font-size:11px;color:#9494a8;'>{esc(source_left)} ↔ {esc(source_right)}</div>"
-                f"<div style='font-size:10px;color:#6b6b80;'>{esc(region_or_cat)}</div>",
+                f"<div style='font-size:11px;color:#64748B;'>{esc(source_left)} ↔ {esc(source_right)}</div>"
+                f"<div style='font-size:10px;color:#94A3B8;'>{esc(region_or_cat)}</div>",
                 unsafe_allow_html=True,
             )
         with col3:
             st.markdown(
                 f"<span style='color:{color};font-weight:700;font-size:14px;'>{score_val:.4f}</span>"
-                f"<span style='font-size:10px;color:#9494a8;margin-left:4px;'>{icon}</span>",
+                f"<span style='font-size:10px;color:#64748B;margin-left:4px;'>{icon}</span>",
                 unsafe_allow_html=True,
             )
         with col4:
             st.markdown(reviewed_tag, unsafe_allow_html=True)
         with col5:
             st.markdown(
-                f"<span style='font-size:10px;color:#9494a8;'>#{global_idx+1}</span>",
+                f"<span style='font-size:10px;color:#64748B;'>#{global_idx+1}</span>",
                 unsafe_allow_html=True,
             )
         with col6:
-            if st.button("🔍 审核", key=f"review_btn_{entity}_{global_idx}", width="stretch"):
+            if st.button("🔍 审核", key=f"review_btn_{entity}_{global_idx}", use_container_width=True):
                 st.session_state[f"current_index_{entity}"] = int(
                     queue_df[
                         (queue_df["record_id_left"] == row["record_id_left"])
@@ -979,6 +1572,17 @@ def render_detail_review(entity: str) -> None:
         st.warning(f"当前没有{entity_name}审核队列数据。")
         return
 
+    st.markdown(
+        """<div class='section-header'>
+          <div class='section-header-icon pink'>📝</div>
+          <div>
+            <div class='section-header-title'>详情审核</div>
+            <div class='section-header-sub'>双侧对比 · 智能建议 · 决策提交</div>
+          </div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
+
     # ── Dify 增强数据 ──
     dify_data = {}
     enriched_file = DATA_DIR / f"{entity}_review_enriched.csv"
@@ -1021,17 +1625,17 @@ def render_detail_review(entity: str) -> None:
         dify_conf = dify["confidence"]
         dify_reason = dify["reasoning"]
         if dify_decision == "merge":
-            dify_color = "#38a169"; dify_icon = "🤖"; dify_label = "LLM 建议合并"
+            dify_color = "#34D399"; dify_icon = "🤖"; dify_label = "LLM 建议合并"
         elif dify_decision == "no_match":
-            dify_color = "#e53e3e"; dify_icon = "🤖"; dify_label = "LLM 建议不合并"
+            dify_color = "#F472B6"; dify_icon = "🤖"; dify_label = "LLM 建议不合并"
         else:
-            dify_color = "#e69148"; dify_icon = "🤖"; dify_label = "LLM 建议保留"
+            dify_color = "#FBBF24"; dify_icon = "🤖"; dify_label = "LLM 建议保留"
 
     # ── 顶部导航栏 ──
     _md(f"""\
     <div class='card' style='display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;'>
       <div style='display:flex;align-items:center;gap:16px;'>
-        <span style='color:#f0f0f4;font-weight:600;'>📝 审核详情</span>
+        <span style='color:#1E293B;font-weight:600;'>📝 审核详情</span>
         <span class='entity-tag {"customer" if entity == "customer" else "product"}'>
           {"👤 客户" if entity == "customer" else "📦 商品"}
         </span>
@@ -1040,8 +1644,8 @@ def render_detail_review(entity: str) -> None:
         </span>
         {f'<span class="badge badge-success">✓ 已审核</span>' if is_already_reviewed else '<span class="badge badge-warn">⏳ 待审核</span>'}
       </div>
-      <div style='color:#9494a8;font-size:13px;'>
-        第 <strong style='color:#f0f0f4;'>{current_index + 1}</strong> / {len(queue_df)} 条
+      <div style='color:#64748B;font-size:13px;'>
+        第 <strong style='color:#1E293B;'>{current_index + 1}</strong> / {len(queue_df)} 条
       </div>
     </div>\
     """)
@@ -1049,11 +1653,11 @@ def render_detail_review(entity: str) -> None:
     # ── 导航按钮行 ──
     nav_col1, nav_col2, nav_col3, nav_col4, nav_col5 = st.columns([1, 1, 2, 1, 1])
     with nav_col1:
-        if st.button("⏮ 首条", disabled=(current_index == 0), key=f"nav_first_{entity}", width="stretch"):
+        if st.button("⏮ 首条", disabled=(current_index == 0), key=f"nav_first_{entity}", use_container_width=True):
             st.session_state[session_key] = 0
             st.rerun()
     with nav_col2:
-        if st.button("◀ 上一条", disabled=(current_index == 0), key=f"nav_prev_{entity}", width="stretch"):
+        if st.button("◀ 上一条", disabled=(current_index == 0), key=f"nav_prev_{entity}", use_container_width=True):
             st.session_state[session_key] = current_index - 1
             st.rerun()
     with nav_col3:
@@ -1068,11 +1672,11 @@ def render_detail_review(entity: str) -> None:
             st.session_state[session_key] = int(jump_val) - 1
             st.rerun()
     with nav_col4:
-        if st.button("下一条 ▶", disabled=(current_index >= max_index), key=f"nav_next_{entity}", width="stretch"):
+        if st.button("下一条 ▶", disabled=(current_index >= max_index), key=f"nav_next_{entity}", use_container_width=True):
             st.session_state[session_key] = current_index + 1
             st.rerun()
     with nav_col5:
-        if st.button("⏭ 末条", disabled=(current_index >= max_index), key=f"nav_last_{entity}", width="stretch"):
+        if st.button("⏭ 末条", disabled=(current_index >= max_index), key=f"nav_last_{entity}", use_container_width=True):
             st.session_state[session_key] = max_index
             st.rerun()
 
@@ -1087,8 +1691,8 @@ def render_detail_review(entity: str) -> None:
         _md(f"""\
         <div class='card card-sm' style='text-align:center;margin-top:12px;'>
           <div class='metric-lbl'>源对类型</div>
-          <div style='font-size:16px;color:#f0f0f4;margin-top:4px;'>{esc(pair_source)}</div>
-          <div style='font-size:11px;color:#6b6b80;margin-top:4px;'>
+          <div style='font-size:16px;color:#1E293B;margin-top:4px;'>{esc(pair_source)}</div>
+          <div style='font-size:11px;color:#94A3B8;margin-top:4px;'>
             {SOURCE_LABEL_MAP.get(current_row.get("source_left",""), "")} ↔ {SOURCE_LABEL_MAP.get(current_row.get("source_right",""), "")}
           </div>
         </div>\
@@ -1103,8 +1707,8 @@ def render_detail_review(entity: str) -> None:
               <div style='font-size:20px;font-weight:700;color:{dify_color};margin:6px 0;'>
                 {dify_icon} {dify_label}
               </div>
-              <div style='font-size:11px;color:#9494a8;'>置信度 {dify_conf_val:.2f}</div>
-              <div style='font-size:11px;color:#6b6b80;margin-top:4px;line-height:1.4;'>
+              <div style='font-size:11px;color:#64748B;'>置信度 {dify_conf_val:.2f}</div>
+              <div style='font-size:11px;color:#94A3B8;margin-top:4px;line-height:1.4;'>
                 {esc(dify_reason[:150])}
               </div>
             </div>\
@@ -1138,7 +1742,7 @@ def render_detail_review(entity: str) -> None:
 
         with form_col1:
             st.markdown(
-                "<div style='color:#9494a8;font-size:12px;margin-bottom:8px;'>审核决策</div>",
+                "<div style='color:#64748B;font-size:12px;margin-bottom:8px;'>审核决策</div>",
                 unsafe_allow_html=True,
             )
             decision = st.radio(
@@ -1151,7 +1755,7 @@ def render_detail_review(entity: str) -> None:
             )
         with form_col2:
             st.markdown(
-                "<div style='color:#9494a8;font-size:12px;margin-bottom:8px;'>备注（可选）</div>",
+                "<div style='color:#64748B;font-size:12px;margin-bottom:8px;'>备注（可选）</div>",
                 unsafe_allow_html=True,
             )
             comment = st.text_area(
@@ -1162,7 +1766,7 @@ def render_detail_review(entity: str) -> None:
             )
         with form_col3:
             st.markdown("<div style='height:24px;'></div>", unsafe_allow_html=True)
-            submitted = st.form_submit_button("✅ 提交决策", width="stretch")
+            submitted = st.form_submit_button("✅ 提交决策", use_container_width=True)
 
         if submitted:
             append_review_log(
@@ -1186,21 +1790,21 @@ def render_detail_review(entity: str) -> None:
     # ── 操作按钮行：跳过 / 撤销 / 下一未审核 ──
     op_col1, op_col2, op_col3 = st.columns([1, 1, 1])
     with op_col1:
-        if st.button("⏭ 跳过此条", key=f"skip_{entity}_{current_index}", width="stretch"):
+        if st.button("⏭ 跳过此条", key=f"skip_{entity}_{current_index}", use_container_width=True):
             if current_index < max_index:
                 st.session_state[session_key] += 1
                 st.rerun()
             else:
                 st.info("已是最后一条")
     with op_col2:
-        if st.button("↩ 撤销上一条", key=f"undo_{entity}", width="stretch"):
+        if st.button("↩ 撤销上一条", key=f"undo_{entity}", use_container_width=True):
             if remove_last_log_entry(entity):
                 st.toast("已撤销上一条审核决策", icon="↩")
                 st.rerun()
             else:
                 st.info("没有可撤销的记录")
     with op_col3:
-        if st.button("⏩ 下一未审核", key=f"next_unreviewed_{entity}_{current_index}", width="stretch"):
+        if st.button("⏩ 下一未审核", key=f"next_unreviewed_{entity}_{current_index}", use_container_width=True):
             found = False
             for i in range(current_index + 1, len(queue_df)):
                 r = queue_df.iloc[i]
@@ -1220,7 +1824,16 @@ def render_detail_review(entity: str) -> None:
 
 def render_history(entity: str) -> None:
     """渲染审核历史 Tab"""
-    st.markdown("### 📋 审核历史与导出")
+    st.markdown(
+        """<div class='section-header'>
+          <div class='section-header-icon emerald'>📋</div>
+          <div>
+            <div class='section-header-title'>审核历史与导出</div>
+            <div class='section-header-sub'>筛选 · 分页 · CSV 导出</div>
+          </div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
 
     log_df = load_review_log(entity)
 
@@ -1265,7 +1878,7 @@ def render_history(entity: str) -> None:
         filtered_log = filtered_log[mask]
 
     st.markdown(
-        f"<div style='color:#9494a8;font-size:12px;margin-bottom:8px;'>"
+        f"<div style='color:#64748B;font-size:12px;margin-bottom:8px;'>"
         f"共 {len(filtered_log)} 条记录（总计 {len(log_df)} 条）"
         f"</div>",
         unsafe_allow_html=True,
@@ -1293,8 +1906,8 @@ def render_history(entity: str) -> None:
     export_col1, export_col2 = st.columns([3, 1])
     with export_col1:
         st.markdown(
-            "<span style='color:#f0f0f4;font-weight:600;'>📥 导出审核日志</span>"
-            "<span style='color:#9494a8;font-size:12px;margin-left:8px;'>下载 CSV 文件</span>",
+            "<span style='color:#1E293B;font-weight:600;'>📥 导出审核日志</span>"
+            "<span style='color:#64748B;font-size:12px;margin-left:8px;'>下载 CSV 文件</span>",
             unsafe_allow_html=True,
         )
     with export_col2:
@@ -1305,7 +1918,7 @@ def render_history(entity: str) -> None:
             f"{entity}_review_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
             "text/csv",
             key=f"download_log_{entity}",
-            width="stretch",
+            use_container_width=True,
         )
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -1316,7 +1929,16 @@ def render_history(entity: str) -> None:
 
 def render_golden_records(entity: str) -> None:
     """渲染黄金记录 Tab"""
-    st.markdown("### 🏆 黄金主数据记录")
+    st.markdown(
+        """<div class='section-header'>
+          <div class='section-header-icon amber'>🏆</div>
+          <div>
+            <div class='section-header-title'>黄金主数据记录</div>
+            <div class='section-header-sub'>最终实体 · 去重指标 · 数据导出</div>
+          </div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
 
     golden_df = load_golden(entity)
     final_metrics = load_json(FINAL_METRICS_FILES[entity])
@@ -1333,21 +1955,24 @@ def render_golden_records(entity: str) -> None:
 
     _md(f"""\
     <div class='grid-3'>
-      <div class='card card-sm'>
-        <div class='metric-val' style='color:#68d391;'>{fmt_num(final_metrics.get("final_entity_count", len(golden_df)))}</div>
-        <div class='metric-lbl'>🏆 黄金实体数</div>
+      <div class='card card-sm card-emerald' style='margin-top:22px;'>
+        <div class='card-icon-circle emerald'>🏆</div>
+        <div class='metric-val' style='color:var(--quaternary);'>{fmt_num(final_metrics.get("final_entity_count", len(golden_df)))}</div>
+        <div class='metric-lbl'>黄金实体数</div>
         <div class='metric-sub'>从 {fmt_num(source_total)} 条源记录合并</div>
       </div>
-      <div class='card card-sm'>
+      <div class='card card-sm card-amber' style='margin-top:22px;'>
+        <div class='card-icon-circle amber'>🔗</div>
         <div class='metric-val'>{fmt_num(final_metrics.get("total_merge_pairs", 0))}</div>
-        <div class='metric-lbl'>🔗 总合并对</div>
+        <div class='metric-lbl'>总合并对</div>
         <div class='metric-sub'>自动 {fmt_num(final_metrics.get("auto_merge_pairs", 0))} · 人工 {fmt_num(final_metrics.get("manual_merge_pairs", 0))}</div>
       </div>
-      <div class='card card-sm'>
-        <div class='metric-val' style='color:#4d7ff7;'>
+      <div class='card card-sm card-accent' style='margin-top:22px;'>
+        <div class='card-icon-circle violet'>📉</div>
+        <div class='metric-val' style='color:var(--accent);'>
           {((source_total - final_metrics.get("final_entity_count", source_total)) / source_total * 100):.1f}%
         </div>
-        <div class='metric-lbl'>📉 去重率</div>
+        <div class='metric-lbl'>去重率</div>
         <div class='metric-sub'>消除 {fmt_num(source_total - final_metrics.get("final_entity_count", 0))} 条重复</div>
       </div>
     </div>\
@@ -1367,14 +1992,16 @@ def render_golden_records(entity: str) -> None:
 
     _md(f"""\
     <div class='grid-2'>
-      <div class='card card-sm'>
-        <div class='metric-lbl'>🎯 估计匹配准确率 (Precision)</div>
-        <div class='metric-val sm' style='color:#4d7ff7;'>{estimated_precision:.1f}%</div>
+      <div class='card card-sm' style='margin-top:22px;'>
+        <div class='card-icon-circle violet'>🎯</div>
+        <div class='metric-lbl'>估计匹配准确率 (Precision)</div>
+        <div class='metric-val sm' style='color:var(--accent);'>{estimated_precision:.1f}%</div>
         <div class='metric-sub'>高置信自动合并准确率: {auto_merge_true*100:.1f}%</div>
       </div>
-      <div class='card card-sm'>
-        <div class='metric-lbl'>🔍 估计匹配召回率 (Recall)</div>
-        <div class='metric-val sm' style='color:#f6ad55;'>{estimated_recall:.1f}%</div>
+      <div class='card card-sm' style='margin-top:22px;'>
+        <div class='card-icon-circle amber'>🔍</div>
+        <div class='metric-lbl'>估计匹配召回率 (Recall)</div>
+        <div class='metric-val sm' style='color:var(--tertiary);'>{estimated_recall:.1f}%</div>
         <div class='metric-sub'>总真匹配对: {total_true_pairs}</div>
       </div>
     </div>\
@@ -1384,7 +2011,7 @@ def render_golden_records(entity: str) -> None:
     with st.expander(f"📋 黄金记录预览（共 {len(golden_df)} 条）", expanded=False):
         st.dataframe(
             golden_df.head(100),
-            width="stretch",
+            use_container_width=True,
             hide_index=True,
             column_config={
                 col: st.column_config.TextColumn(col, width="small")
@@ -1397,7 +2024,7 @@ def render_golden_records(entity: str) -> None:
     dl_col1, dl_col2, dl_col3 = st.columns([2, 1, 1])
     with dl_col1:
         st.markdown(
-            "<span style='color:#f0f0f4;font-weight:600;'>📥 数据导出</span>",
+            "<span style='color:#1E293B;font-weight:600;'>📥 数据导出</span>",
             unsafe_allow_html=True,
         )
     with dl_col2:
@@ -1407,7 +2034,7 @@ def render_golden_records(entity: str) -> None:
             f"golden_{entity}s_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
             "text/csv",
             key=f"download_golden_{entity}",
-            width="stretch",
+            use_container_width=True,
         )
     with dl_col3:
         st.download_button(
@@ -1416,7 +2043,7 @@ def render_golden_records(entity: str) -> None:
             f"{entity}_metrics_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
             "application/json",
             key=f"download_metrics_{entity}",
-            width="stretch",
+            use_container_width=True,
         )
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -1437,11 +2064,33 @@ def main():
     # ── 自定义 CSS ──
     st.markdown(CSS, unsafe_allow_html=True)
 
+    # ── 装饰性 Confetti 背景 ──
+    st.markdown(
+        """<div class='confetti-container'>
+          <div class='confetti-piece'></div>
+          <div class='confetti-piece'></div>
+          <div class='confetti-piece'></div>
+          <div class='confetti-piece'></div>
+          <div class='confetti-piece'></div>
+          <div class='confetti-piece'></div>
+          <div class='confetti-piece'></div>
+          <div class='confetti-piece'></div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
+
     # ── 侧边栏 ──
     with st.sidebar:
         st.markdown(
-            "<div style='font-size:20px;font-weight:700;color:#f0f0f4;margin-bottom:4px;'>🧩 MDM 系统</div>"
-            "<div style='font-size:12px;color:#6b6b80;margin-bottom:16px;'>主数据管理智能清洗</div>",
+            "<div style='font-size:20px;font-weight:800;color:#1E293B;margin-bottom:2px;"
+            "font-family:Outfit,system-ui,sans-serif;display:flex;align-items:center;gap:8px;'>"
+            "<span style='display:inline-flex;align-items:center;justify-content:center;"
+            "width:32px;height:32px;border-radius:10px;background:var(--accent);"
+            "border:2px solid var(--border-dark);font-size:16px;'>🧩</span>"
+            "MDM 系统</div>"
+            "<div style='font-size:11px;color:#64748B;margin-bottom:14px;padding-left:40px;'>"
+            "主数据管理智能清洗</div>"
+            "<div class='squiggle-divider'></div>",
             unsafe_allow_html=True,
         )
 
@@ -1452,32 +2101,72 @@ def main():
             key="entity_select",
         )
 
-        st.markdown("<hr>", unsafe_allow_html=True)
+        st.markdown("<div class='squiggle-divider'></div>", unsafe_allow_html=True)
 
-        # 快速统计
+        # ── 竖直导航菜单 ──
+        TAB_LABELS = ["📊 仪表板", "🔍 审核队列", "📝 详情审核", "📋 审核历史", "🏆 黄金记录"]
+        if "active_tab" not in st.session_state:
+            st.session_state["active_tab"] = 0
+        st.session_state["active_tab"] = max(0, min(st.session_state["active_tab"], len(TAB_LABELS) - 1))
+
+        active_idx = st.radio(
+            "导航",
+            TAB_LABELS,
+            index=st.session_state["active_tab"],
+            label_visibility="collapsed",
+            key="tab_selector",
+        )
+        st.session_state["active_tab"] = TAB_LABELS.index(active_idx)
+
+        st.markdown("<div class='squiggle-divider'></div>", unsafe_allow_html=True)
+
+        # 快速统计 — 卡片式布局
         queue_df = load_review_queue(entity)
         reviewed_pairs = get_reviewed_pairs(entity)
+        total_queue = len(queue_df)
+        total_reviewed = len(reviewed_pairs)
+        remaining = max(0, total_queue - total_reviewed)
+        progress = total_reviewed / max(total_queue, 1)
 
+        # 加载审核日志获取决策统计
+        log_df = load_review_log(entity)
+        merge_count = len(log_df[log_df["decision"] == "合并"]) if not log_df.empty else 0
+        not_merge_count = len(log_df[log_df["decision"] == "不合并"]) if not log_df.empty else 0
+        pending_count = len(log_df[log_df["decision"] == "保留待定"]) if not log_df.empty else 0
+        total_log = len(log_df)
+        merge_rate = (merge_count / total_log * 100) if total_log > 0 else 0
+
+        _md(f"""\
+        <div class='sidebar-card sidebar-card-accent'>
+          <div class='sidebar-icon violet'>📥</div>
+          <div class='sidebar-metric-val'>{fmt_num(total_queue)}</div>
+          <div class='sidebar-metric-lbl'>待审核候选对</div>
+          <div class='sidebar-metric-sub'>剩余 {remaining} 条未审核</div>
+        </div>
+        <div class='sidebar-card sidebar-card-emerald'>
+          <div class='sidebar-icon emerald'>✅</div>
+          <div class='sidebar-metric-val'>{fmt_num(total_reviewed)}</div>
+          <div class='sidebar-metric-lbl'>已审核记录</div>
+          <div class='sidebar-metric-sub'>进度 {progress*100:.1f}%</div>
+        </div>
+        <div class='sidebar-card sidebar-card-emerald'>
+          <div class='sidebar-icon emerald'>🔗</div>
+          <div class='sidebar-metric-val' style='color:var(--quaternary);'>{merge_count}</div>
+          <div class='sidebar-metric-lbl'>合并决策</div>
+          <div class='sidebar-metric-sub'>合并率 {merge_rate:.1f}%</div>
+        </div>
+        <div class='sidebar-card sidebar-card-pink'>
+          <div class='sidebar-icon pink'>❌</div>
+          <div class='sidebar-metric-val' style='color:var(--secondary);'>{not_merge_count}</div>
+          <div class='sidebar-metric-lbl'>不合并决策</div>
+          <div class='sidebar-metric-sub'>待定 {pending_count} 条</div>
+        </div>\
+        """)
+
+        st.markdown("<div class='squiggle-divider'></div>", unsafe_allow_html=True)
         st.markdown(
-            f"""
-            <div style='font-size:12px;color:#9494a8;line-height:1.8;'>
-              <div>📥 队列总数：<strong style='color:#f0f0f4;'>{fmt_num(len(queue_df))}</strong></div>
-              <div>✅ 已审核：<strong style='color:#f0f0f4;'>{fmt_num(len(reviewed_pairs))}</strong></div>
-              <div>⏳ 待审核：<strong style='color:#f0f0f4;'>{fmt_num(max(0, len(queue_df) - len(reviewed_pairs)))}</strong></div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        # 进度条
-        if len(queue_df) > 0:
-            progress = len(reviewed_pairs) / len(queue_df)
-            st.progress(min(progress, 1.0), text=f"审核进度 {progress*100:.1f}%")
-
-        st.markdown("<hr>", unsafe_allow_html=True)
-        st.markdown(
-            "<div style='font-size:11px;color:#6b6b80;'>"
-            "v2.0 · MDM 智能审核系统<br>"
+            "<div style='font-size:11px;color:#94A3B8;'>"
+            "<span class='dot-accent pink'></span>v2.0 · MDM 智能审核系统<br>"
             "基于规则+Embedding的多策略匹配"
             "</div>",
             unsafe_allow_html=True,
@@ -1485,37 +2174,39 @@ def main():
 
     # ── 页头 ──
     _md(f"""\
-    <div class='card' style='display:flex;justify-content:space-between;align-items:center;'>
-      <div>
+    <div class='card card-blob bg-stripes' style='display:flex;justify-content:space-between;align-items:center;position:relative;overflow:hidden;'>
+      <div class='deco-circle' style='width:60px;height:60px;top:-20px;right:80px;background:rgba(244,114,182,0.12);'></div>
+      <div class='deco-circle' style='width:40px;height:40px;bottom:-10px;right:160px;background:rgba(251,191,36,0.15);'></div>
+      <div style='position:relative;z-index:1;'>
         <div class='page-title'>🧩 主数据匹配审核界面</div>
         <div class='page-subtitle'>
           当前实体：{"👤 客户主数据" if entity == "customer" else "📦 商品主数据"}
           · 审核队列 {len(queue_df)} 条 · 已审核 {len(reviewed_pairs)} 条
         </div>
+        <div class='hero-stats'>
+          <div class='hero-stat'>
+            <div class='hero-stat-val' style='color:var(--accent);'>{fmt_num(len(queue_df))}</div>
+            <div class='hero-stat-lbl'>待审核</div>
+          </div>
+          <div class='hero-stat'>
+            <div class='hero-stat-val' style='color:var(--quaternary);'>{fmt_num(len(reviewed_pairs))}</div>
+            <div class='hero-stat-lbl'>已审核</div>
+          </div>
+          <div class='hero-stat'>
+            <div class='hero-stat-val' style='color:var(--tertiary);'>{len(load_review_log(entity))/max(len(queue_df),1)*100:.0f}%</div>
+            <div class='hero-stat-lbl'>完成率</div>
+          </div>
+        </div>
       </div>
-      <div style='text-align:right;'>
+      <div style='text-align:right;position:relative;z-index:1;'>
         <span class='entity-tag {"customer" if entity == "customer" else "product"}'>
           {"CRM + ERP + 电商" if entity == "customer" else "ERP + 电商"}
         </span>
+        <div style='margin-top:8px;font-size:11px;color:var(--muted-fg);'>v2.0 · MDM 智能审核系统</div>
       </div>
-    </div>\
+    </div>
+    <div class='squiggle-divider'></div>\
     """)
-
-    # ── Tab 导航（用 radio 替代 tabs，支持程序化跳转） ──
-    TAB_LABELS = ["📊 仪表板", "🔍 审核队列", "📝 详情审核", "📋 审核历史", "🏆 黄金记录"]
-    if "active_tab" not in st.session_state:
-        st.session_state["active_tab"] = 0
-    st.session_state["active_tab"] = max(0, min(st.session_state["active_tab"], len(TAB_LABELS) - 1))
-
-    active_idx = st.radio(
-        "导航",
-        TAB_LABELS,
-        index=st.session_state["active_tab"],
-        horizontal=True,
-        label_visibility="collapsed",
-        key="tab_selector",
-    )
-    st.session_state["active_tab"] = TAB_LABELS.index(active_idx)
 
     if active_idx == "📊 仪表板":
         render_dashboard(entity)
