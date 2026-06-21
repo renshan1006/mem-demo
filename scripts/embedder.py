@@ -10,6 +10,7 @@
 
 import logging
 import os
+from contextlib import contextmanager
 from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Optional
@@ -20,6 +21,23 @@ import pandas as pd
 # 国内优先使用 HF 镜像
 if not os.environ.get("HF_ENDPOINT"):
     os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
+
+# 保护 shim: transformers>=4.40 在加载模型时会调用 accelerate.init_empty_weights，
+# 如果环境未装 accelerate 就会抛 NameError。这里提供一个 no-op fallback，
+# 让程序即使缺 accelerate 也能优雅降级，而不是直接炸掉模型加载流程。
+try:
+    from accelerate import init_empty_weights as _init_empty_weights  # noqa: F401
+except Exception:  # pragma: no cover - 仅在 accelerate 缺失时触发
+    try:
+        import accelerate  # noqa: F401
+    except Exception:
+        @contextmanager
+        def init_empty_weights(*args, **kwargs):
+            yield
+
+        import builtins as _builtins
+        if not hasattr(_builtins, "init_empty_weights"):
+            _builtins.init_empty_weights = init_empty_weights
 
 logger = logging.getLogger(__name__)
 

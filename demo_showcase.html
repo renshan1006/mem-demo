@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MDM 主数据管理智能清洗系统 · 核心流程可视化</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ========= 设计系统（与 Streamlit 审核页面保持一致） ========= */
+  :root{
+    --bg:#FFFDF5;
+    --fg:#1E293B;
+    --muted:#F1F5F9;
+    --muted-fg:#64748B;
+    --accent:#8B5CF6;
+    --accent-hover:#7C3AED;
+    --secondary:#F472B6;
+    --tertiary:#FBBF24;
+    --quaternary:#34D399;
+    --border:#E2E8F0;
+    --border-dark:#1E293B;
+    --card:#FFFFFF;
+    --radius-sm:8px;
+    --radius-md:16px;
+    --radius-lg:24px;
+    --radius-full:9999px;
+    --shadow:4px 4px 0px 0px var(--border-dark);
+    --shadow-hover:6px 6px 0px 0px var(--border-dark);
+    --bounce:cubic-bezier(0.34,1.56,0.64,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+    color:var(--fg);
+    background:var(--bg);
+    background-image:radial-gradient(circle,#CBD5E1 1.2px,transparent 1.2px);
+    background-size:22px 22px;
+    line-height:1.55;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+
+  /* ========= Hero ========= */
+  .hero{
+    position:relative;
+    padding:56px 24px 40px;
+    text-align:center;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:'';
+    position:absolute;top:-120px;right:-100px;
+    width:400px;height:400px;border-radius:50%;
+    background:rgba(139,92,246,0.04);
+    border:3px solid rgba(139,92,246,0.08);
+    pointer-events:none;z-index:0;
+  }
+  .hero::after{
+    content:'';
+    position:absolute;bottom:-80px;left:-80px;
+    width:300px;height:300px;border-radius:50%;
+    background:rgba(244,114,182,0.04);
+    border:3px solid rgba(244,114,182,0.08);
+    pointer-events:none;z-index:0;
+  }
+  .hero-badge{
+    display:inline-block;
+    padding:6px 18px;
+    border:2px solid var(--border-dark);
+    border-radius:var(--radius-full);
+    background:#EDE9FE;
+    color:#5B21B6;
+    font-weight:700;font-size:13px;
+    box-shadow:3px 3px 0px 0px var(--border-dark);
+    margin-bottom:20px;
+    animation:pop-in 0.6s var(--bounce);
+    position:relative;z-index:1;
+  }
+  .hero h1{
+    font-family:'Outfit',sans-serif;
+    font-size:clamp(32px,5vw,56px);
+    font-weight:800;
+    letter-spacing:-0.02em;
+    line-height:1.1;
+    margin-bottom:16px;
+    position:relative;z-index:1;
+    animation:pop-in 0.7s var(--bounce) 0.05s both;
+  }
+  .hero h1 .highlight{
+    background:linear-gradient(120deg,var(--accent),var(--secondary));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .hero p{
+    font-size:clamp(15px,1.8vw,18px);
+    color:var(--muted-fg);
+    max-width:780px;
+    margin:0 auto;
+    position:relative;z-index:1;
+    animation:pop-in 0.7s var(--bounce) 0.1s both;
+  }
+  .hero-stats{
+    display:flex;justify-content:center;gap:40px;
+    margin-top:32px;flex-wrap:wrap;
+    position:relative;z-index:1;
+  }
+  .hero-stat{text-align:center;animation:pop-in 0.7s var(--bounce) 0.15s both;}
+  .hero-stat-val{
+    font-family:'Outfit',sans-serif;
+    font-size:36px;font-weight:800;
+  }
+  .hero-stat-lbl{
+    font-size:11px;color:var(--muted-fg);
+    text-transform:uppercase;letter-spacing:0.05em;
+    font-weight:600;
+  }
+
+  /* ========= 通用 Section 与 Card ========= */
+  section{
+    max-width:1400px;
+    margin:0 auto;
+    padding:48px 24px;
+    position:relative;
+  }
+  .section-header{
+    display:flex;align-items:center;gap:16px;
+    margin-bottom:32px;
+    justify-content:center;flex-direction:column;text-align:center;
+  }
+  .section-step{
+    display:inline-block;
+    padding:8px 20px;
+    border:2px solid var(--border-dark);
+    border-radius:var(--radius-full);
+    font-weight:800;font-size:13px;
+    box-shadow:3px 3px 0px 0px var(--border-dark);
+  }
+  .step-1{background:#EDE9FE;color:#5B21B6;}
+  .step-2{background:#FEF3C7;color:#92400E;}
+  .step-3{background:#D1FAE5;color:#065F46;}
+  .section-title{
+    font-family:'Outfit',sans-serif;
+    font-size:clamp(26px,3.5vw,38px);
+    font-weight:800;letter-spacing:-0.02em;
+    margin:8px 0 4px;
+  }
+  .section-sub{
+    color:var(--muted-fg);
+    font-size:15px;max-width:720px;
+  }
+
+  .card{
+    background:var(--card);
+    border:2px solid var(--border-dark);
+    border-radius:var(--radius-md);
+    padding:24px;
+    box-shadow:var(--shadow);
+    transition:transform 0.3s var(--bounce),box-shadow 0.3s var(--bounce);
+    animation:card-enter 0.5s var(--bounce) both;
+    position:relative;
+  }
+  .card:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-hover);}
+  .card-icon-circle{
+    width:52px;height:52px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;
+    border:2px solid var(--border-dark);
+    position:absolute;top:-26px;right:20px;
+    box-shadow:2px 2px 0px 0px var(--border-dark);
+    z-index:2;
+  }
+  .card-icon-circle.violet{background:var(--accent);}
+  .card-icon-circle.pink{background:var(--secondary);}
+  .card-icon-circle.amber{background:var(--tertiary);}
+  .card-icon-circle.emerald{background:var(--quaternary);}
+
+  /* ========= Section 1: 多源数据接入 ========= */
+  .data-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+    margin-top:12px;
+  }
+  .data-file{
+    background:var(--card);
+    border:2px solid var(--border-dark);
+    border-radius:var(--radius-md);
+    padding:20px 18px;
+    box-shadow:var(--shadow);
+    position:relative;
+    transition:transform 0.3s var(--bounce),box-shadow 0.3s var(--bounce);
+    animation:card-enter 0.5s var(--bounce) both;
+  }
+  .data-file:hover{transform:rotate(-1deg) scale(1.02);box-shadow:var(--shadow-hover);}
+  .data-file:nth-child(1){border-color:var(--accent);box-shadow:4px 4px 0px 0px var(--accent);}
+  .data-file:nth-child(1):hover{box-shadow:6px 6px 0px 0px var(--accent);}
+  .data-file:nth-child(2){border-color:var(--secondary);box-shadow:4px 4px 0px 0px var(--secondary);}
+  .data-file:nth-child(2):hover{box-shadow:6px 6px 0px 0px var(--secondary);}
+  .data-file:nth-child(3){border-color:var(--tertiary);box-shadow:4px 4px 0px 0px var(--tertiary);}
+  .data-file:nth-child(3):hover{box-shadow:6px 6px 0px 0px var(--tertiary);}
+  .data-file:nth-child(4){border-color:var(--quaternary);box-shadow:4px 4px 0px 0px var(--quaternary);}
+  .data-file:nth-child(4):hover{box-shadow:6px 6px 0px 0px var(--quaternary);}
+  .data-file:nth-child(5){border-color:var(--accent);box-shadow:4px 4px 0px 0px var(--accent);}
+  .data-file:nth-child(5):hover{box-shadow:6px 6px 0px 0px var(--accent);}
+
+  .file-icon{
+    width:44px;height:44px;border-radius:12px;
+    border:2px solid var(--border-dark);
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;margin-bottom:12px;
+    background:#F8FAFC;
+  }
+  .file-name{
+    font-family:'Outfit',sans-serif;
+    font-size:15px;font-weight:700;
+    margin-bottom:4px;word-break:break-all;
+  }
+  .file-source{
+    font-size:11px;color:var(--muted-fg);
+    text-transform:uppercase;letter-spacing:0.05em;
+    font-weight:600;margin-bottom:10px;
+  }
+  .file-records{
+    font-family:'Outfit',sans-serif;
+    font-size:28px;font-weight:800;
+    color:var(--fg);
+  }
+  .file-records span{font-size:13px;color:var(--muted-fg);font-weight:600;margin-left:4px;}
+
+  /* 终端窗口 */
+  .terminal{
+    background:#0F172A;
+    border:2px solid var(--border-dark);
+    border-radius:var(--radius-md);
+    padding:20px;
+    margin-top:28px;
+    box-shadow:var(--shadow);
+    font-family:'SF Mono','Courier New',monospace;
+    color:#E2E8F0;
+    font-size:13px;
+    line-height:1.7;
+    overflow-x:auto;
+  }
+  .terminal-bar{
+    display:flex;gap:6px;margin-bottom:14px;
+  }
+  .terminal-bar span{
+    width:12px;height:12px;border-radius:50%;
+    display:inline-block;
+  }
+  .terminal-bar span:nth-child(1){background:#EF4444;}
+  .terminal-bar span:nth-child(2){background:#F59E0B;}
+  .terminal-bar span:nth-child(3){background:#10B981;}
+  .terminal-line.prompt{color:#34D399;font-weight:600;}
+  .terminal-line.prompt::before{content:'$ ';}
+  .terminal-line.output{color:#FBBF24;padding-left:16px;}
+  .terminal-line.highlight{color:#F472B6;font-weight:700;padding-left:16px;animation:blink 1.5s ease-in-out infinite;}
+
+  /* ========= Section 2: 匹配算法（三路融合 + 公式） ========= */
+  .fusion-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:24px;
+    margin-top:12px;
+  }
+  .fusion-item{
+    padding:28px 24px;
+    position:relative;
+    min-height:280px;
+  }
+  .fusion-item .tag{
+    display:inline-block;
+    padding:4px 12px;
+    border:2px solid var(--border-dark);
+    border-radius:var(--radius-full);
+    font-size:11px;font-weight:700;
+    margin-bottom:14px;
+  }
+  .fusion-item h3{
+    font-family:'Outfit',sans-serif;
+    font-size:22px;font-weight:800;
+    margin-bottom:10px;
+  }
+  .fusion-item p{font-size:14px;color:var(--muted-fg);margin-bottom:14px;}
+  .fusion-item .code-block{
+    background:#0F172A;color:#E2E8F0;
+    border:2px solid var(--border-dark);
+    border-radius:12px;
+    padding:14px;
+    font-family:'SF Mono','Courier New',monospace;
+    font-size:12px;line-height:1.6;
+    margin-top:auto;
+  }
+  .fusion-item .code-block .kw{color:#F472B6;font-weight:700;}
+  .fusion-item .code-block .str{color:#34D399;}
+  .fusion-item .code-block .num{color:#FBBF24;font-weight:700;}
+
+  .fusion-item.violet{border-color:var(--accent);box-shadow:4px 4px 0px 0px var(--accent);}
+  .fusion-item.violet .tag{background:#EDE9FE;color:#5B21B6;border-color:var(--accent);}
+  .fusion-item.amber{border-color:var(--tertiary);box-shadow:4px 4px 0px 0px var(--tertiary);}
+  .fusion-item.amber .tag{background:#FEF3C7;color:#92400E;border-color:var(--tertiary);}
+  .fusion-item.pink{border-color:var(--secondary);box-shadow:4px 4px 0px 0px var(--secondary);}
+  .fusion-item.pink .tag{background:#FCE7F3;color:#9D174D;border-color:var(--secondary);}
+
+  /* 连接箭头 */
+  .arrow-connector{
+    display:flex;align-items:center;justify-content:center;
+    margin:16px 0;
+    font-family:'Outfit',sans-serif;
+    font-size:28px;font-weight:800;color:var(--accent);
+    gap:18px;
+  }
+  .arrow-connector .plus{color:var(--secondary);}
+  .arrow-connector .equals{color:var(--quaternary);}
+  .arrow-connector span{display:inline-block;animation:float 3s ease-in-out infinite;}
+
+  /* 公式卡片 */
+  .formula-section{
+    margin-top:40px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+  }
+  .formula-card{
+    padding:30px 28px;
+    background:linear-gradient(135deg,#FFFFFF 0%,#FAFAFA 100%);
+  }
+  .formula-card .formula-title{
+    display:flex;align-items:center;gap:10px;
+    font-family:'Outfit',sans-serif;
+    font-size:18px;font-weight:800;
+    margin-bottom:20px;
+  }
+  .formula-card .formula-title .emoji{
+    width:40px;height:40px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;border:2px solid var(--border-dark);
+    box-shadow:2px 2px 0px 0px var(--border-dark);
+  }
+  .formula-card.violet .formula-title .emoji{background:var(--accent);}
+  .formula-card.pink .formula-title .emoji{background:var(--secondary);}
+
+  .formula-body{
+    background:#0F172A;color:#E2E8F0;
+    border:2px solid var(--border-dark);
+    border-radius:12px;padding:20px;
+    font-family:'SF Mono','Courier New',monospace;
+    font-size:14px;line-height:2;
+  }
+  .formula-line{display:flex;align-items:flex-start;flex-wrap:wrap;}
+  .weight-num{
+    display:inline-block;padding:2px 10px;
+    border-radius:var(--radius-full);
+    font-weight:800;margin-right:8px;
+    font-size:13px;
+    border:2px solid var(--border-dark);
+  }
+  .w-violet{background:var(--accent);color:#fff;}
+  .w-pink{background:var(--secondary);color:#fff;}
+  .w-amber{background:var(--tertiary);color:var(--border-dark);}
+  .w-emerald{background:var(--quaternary);color:var(--border-dark);}
+  .w-soft{background:#475569;color:#fff;}
+  .field-name{color:#FBBF24;font-weight:700;}
+  .op{color:#F472B6;font-weight:800;margin:0 6px;}
+  .penalty{color:#EF4444;font-weight:700;margin-top:14px;display:block;font-size:13px;}
+
+  /* ========= Section 3: 管道运行 ========= */
+  .pipeline-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:20px;
+    margin-top:12px;
+  }
+  .threshold-card{
+    padding:24px 20px;
+    text-align:center;
+    animation:card-enter 0.6s var(--bounce) 0.1s both;
+  }
+  .threshold-card .thresh-label{
+    font-size:12px;color:var(--muted-fg);
+    text-transform:uppercase;letter-spacing:0.05em;
+    font-weight:700;margin-bottom:10px;
+  }
+  .threshold-card .thresh-val{
+    font-family:'Outfit',sans-serif;
+    font-size:44px;font-weight:900;
+    margin-bottom:8px;
+  }
+  .threshold-card.merge{border-color:var(--quaternary);box-shadow:4px 4px 0px 0px var(--quaternary);}
+  .threshold-card.merge .thresh-val{color:#065F46;}
+  .threshold-card.review{border-color:var(--tertiary);box-shadow:4px 4px 0px 0px var(--tertiary);}
+  .threshold-card.review .thresh-val{color:#92400E;}
+  .threshold-card.nomatch{border-color:var(--secondary);box-shadow:4px 4px 0px 0px var(--secondary);}
+  .threshold-card.nomatch .thresh-val{color:#9D174D;}
+  .threshold-card .thresh-sub{
+    font-size:13px;color:var(--muted-fg);
+    font-weight:500;margin-top:6px;
+  }
+
+  .queue-summary{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin-top:32px;
+  }
+  .queue-card{
+    padding:28px 24px;
+    display:flex;align-items:center;gap:20px;
+  }
+  .queue-card .big-num{
+    font-family:'Outfit',sans-serif;
+    font-size:56px;font-weight:900;line-height:1;
+    flex-shrink:0;
+  }
+  .queue-card.violet{border-color:var(--accent);box-shadow:4px 4px 0px 0px var(--accent);}
+  .queue-card.violet .big-num{color:#5B21B6;}
+  .queue-card.pink{border-color:var(--secondary);box-shadow:4px 4px 0px 0px var(--secondary);}
+  .queue-card.pink .big-num{color:#9D174D;}
+  .queue-card .info{flex:1;}
+  .queue-card .info h4{
+    font-family:'Outfit',sans-serif;
+    font-size:18px;font-weight:800;margin-bottom:4px;
+  }
+  .queue-card .info p{
+    font-size:13px;color:var(--muted-fg);
+  }
+
+  /* CSV 预览表格 */
+  .csv-preview{
+    margin-top:24px;
+  }
+  .csv-preview-title{
+    font-family:'Outfit',sans-serif;
+    font-size:16px;font-weight:800;
+    margin-bottom:12px;display:flex;align-items:center;gap:10px;
+  }
+  table.csv-table{
+    width:100%;
+    border-collapse:separate;border-spacing:0 4px;
+    font-size:12.5px;
+  }
+  table.csv-table th{
+    background:#F8FAFC;border:2px solid var(--border-dark);
+    padding:8px 12px;text-align:left;
+    font-weight:800;color:var(--fg);
+    font-size:11px;letter-spacing:0.05em;text-transform:uppercase;
+  }
+  table.csv-table th:first-child{border-top-left-radius:8px;border-bottom-left-radius:8px;}
+  table.csv-table th:last-child{border-top-right-radius:8px;border-bottom-right-radius:8px;}
+  table.csv-table td{
+    background:#fff;border:1px solid var(--border);
+    padding:8px 12px;
+    color:var(--fg);font-family:'SF Mono','Courier New',monospace;
+    font-size:12px;
+  }
+  table.csv-table td:first-child{border-top-left-radius:6px;border-bottom-left-radius:6px;border-left:2px solid var(--border);}
+  table.csv-table td:last-child{border-top-right-radius:6px;border-bottom-right-radius:6px;border-right:2px solid var(--border);}
+  table.csv-table tr:first-child td{border-top:2px solid var(--border);}
+  table.csv-table tr:last-child td{border-bottom:2px solid var(--border);}
+  .score-cell{font-weight:800;color:var(--accent);}
+  .score-cell.low{color:#9D174D;}
+  .score-cell.mid{color:#92400E;}
+  .score-cell.high{color:#065F46;}
+
+  /* 管道流程图（三步骤 → → →） */
+  .flow-diagram{
+    display:flex;align-items:stretch;justify-content:space-between;
+    gap:12px;margin:32px 0 8px;flex-wrap:wrap;
+  }
+  .flow-step{
+    flex:1;min-width:160px;
+    background:var(--card);
+    border:2px solid var(--border-dark);
+    border-radius:var(--radius-md);
+    padding:18px;
+    box-shadow:var(--shadow);
+    text-align:center;
+    position:relative;
+  }
+  .flow-step .num{
+    position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+    width:36px;height:36px;border-radius:50%;
+    border:2px solid var(--border-dark);
+    box-shadow:2px 2px 0px 0px var(--border-dark);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Outfit',sans-serif;font-weight:800;
+    font-size:16px;
+  }
+  .flow-step:nth-child(1) .num{background:var(--accent);color:#fff;}
+  .flow-step:nth-child(3) .num{background:var(--tertiary);color:var(--border-dark);}
+  .flow-step:nth-child(5) .num{background:var(--quaternary);color:var(--border-dark);}
+  .flow-step .emoji{font-size:28px;margin:10px 0 6px;}
+  .flow-step h4{
+    font-family:'Outfit',sans-serif;
+    font-size:15px;font-weight:800;margin-bottom:4px;
+  }
+  .flow-step p{font-size:12px;color:var(--muted-fg);}
+  .flow-arrow{
+    display:flex;align-items:center;justify-content:center;
+    font-size:26px;color:var(--accent);font-weight:800;
+    animation:float 2s ease-in-out infinite;
+    flex:0 0 auto;min-width:24px;
+  }
+
+  /* ========= Footer ========= */
+  footer{
+    text-align:center;padding:40px 24px 48px;
+    color:var(--muted-fg);font-size:13px;
+    border-top:2px dashed var(--border);
+    margin-top:40px;
+  }
+  footer .footer-title{
+    font-family:'Outfit',sans-serif;
+    font-size:22px;font-weight:800;
+    color:var(--fg);margin-bottom:6px;
+    background:linear-gradient(120deg,var(--accent),var(--secondary));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+
+  /* ========= 动画 ========= */
+  @keyframes card-enter{
+    0%{opacity:0;transform:scale(0.92) translateY(12px);}
+    70%{transform:scale(1.02);}
+    100%{opacity:1;transform:scale(1) translateY(0);}
+  }
+  @keyframes pop-in{
+    0%{opacity:0;transform:scale(0);}
+    70%{transform:scale(1.1););}
+    100%{opacity:1;transform:scale(1);}
+  }
+  @keyframes float{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-6px);}
+  }
+  @keyframes blink{
+    0%,100%{opacity:1;}
+    50%{opacity:0.5;}
+  }
+
+  /* 响应式 */
+  @media (max-width:880px){
+    .formula-section,.queue-summary{grid-template-columns:1fr;}
+    .flow-arrow{display:none;}
+    .hero-stats{gap:20px;}
+    .hero-stat-val{font-size:28px;}
+    section{padding:32px 16px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ========= HERO ========= -->
+<header class="hero">
+  <span class="hero-badge">🎯 演示视频 · 核心流程可视化</span>
+  <h1>MDM 主数据管理 <span class="highlight">智能清洗系统</span></h1>
+  <p>基于 Dify + Embedding + 规则引擎的跨源客户 / 商品主数据自动化匹配 · 三步骤打通数据接入 → 匹配算法 → 管道运行</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-val" style="color:#5B21B6;">5</div>
+      <div class="hero-stat-lbl">数据源</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val" style="color:#9D174D;">6,200</div>
+      <div class="hero-stat-lbl">总记录</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val" style="color:#92400E;">3</div>
+      <div class="hero-stat-lbl">路融合</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val" style="color:#065F46;">98.2%</div>
+      <div class="hero-stat-lbl">召回率</div>
+    </div>
+  </div>
+</header>
+
+<!-- ========= SECTION 1: 多源数据接入 ========= -->
+<section>
+  <div class="section-header">
+    <span class="section-step step-1">STEP 01 · 6–14 秒</span>
+    <h2 class="section-title">多源数据接入与预处理</h2>
+    <p class="section-sub">3 源客户 + 2 源商品 · 共 6,200 条 · 重复率 15–25% · 覆盖名称变体、中英混合、地址格式不一致</p>
+  </div>
+
+  <div class="data-grid">
+    <div class="data-file">
+      <div class="file-icon">📇</div>
+      <div class="file-name">crm_customers.csv</div>
+      <div class="file-source">CRM · 客户源</div>
+      <div class="file-records">1,600<span>条</span></div>
+    </div>
+    <div class="data-file">
+      <div class="file-icon">🏢</div>
+      <div class="file-name">erp_customers.csv</div>
+      <div class="file-source">ERP · 客户源</div>
+      <div class="file-records">1,400<span>条</span></div>
+    </div>
+    <div class="data-file">
+      <div class="file-icon">🛒</div>
+      <div class="file-name">ecommerce_customers.csv</div>
+      <div class="file-source">ECommerce · 客户源</div>
+      <div class="file-records">1,200<span>条</span></div>
+    </div>
+    <div class="data-file">
+      <div class="file-icon">📦</div>
+      <div class="file-name">erp_products.csv</div>
+      <div class="file-source">ERP · 商品源</div>
+      <div class="file-records">1,000<span>条</span></div>
+    </div>
+    <div class="data-file">
+      <div class="file-icon">🛍️</div>
+      <div class="file-name">ecommerce_products.csv</div>
+      <div class="file-source">ECommerce · 商品源</div>
+      <div class="file-records">1,000<span>条</span></div>
+    </div>
+  </div>
+
+  <!-- 终端窗口：命令执行 -->
+  <div class="terminal">
+    <div class="terminal-bar"><span></span><span></span><span></span></div>
+    <div class="terminal-line prompt">python -c "import pandas as pd; c=sum(len(pd.read_csv('data/'+f)) for f in ['crm_customers.csv','erp_customers.csv','ecommerce_customers.csv','erp_products.csv','ecommerce_products.csv']); print('Total records:', c)"</div>
+    <div class="terminal-line output">→ 读取 crm_customers.csv ........ 1,600 rows ✓</div>
+    <div class="terminal-line output">→ 读取 erp_customers.csv ........ 1,400 rows ✓</div>
+    <div class="terminal-line output">→ 读取 ecommerce_customers.csv .. 1,200 rows ✓</div>
+    <div class="terminal-line output">→ 读取 erp_products.csv ......... 1,000 rows ✓</div>
+    <div class="terminal-line output">→ 读取 ecommerce_products.csv .. 1,000 rows ✓</div>
+    <div class="terminal-line highlight">Total records: 6200  🎉</div>
+  </div>
+</section>
+
+<!-- ========= SECTION 2: 匹配算法 ========= -->
+<section>
+  <div class="section-header">
+    <span class="section-step step-2">STEP 02 · 14–24 秒</span>
+    <h2 class="section-title">阻塞规则 + 语义向量 + 规则加权打分</h2>
+    <p class="section-sub">三路融合策略：先分桶避免 O(n²)，再用 Embedding 处理名称相似度，最后规则加权精确判定</p>
+  </div>
+
+  <!-- 三路融合 图标 -->
+  <div class="arrow-connector">
+    <span>① 阻塞分桶</span>
+    <span class="plus">+</span>
+    <span>② 语义向量</span>
+    <span class="plus">+</span>
+    <span>③ 规则加权</span>
+    <span class="equals">=</span>
+    <span>💎 融合匹配</span>
+  </div>
+
+  <div class="fusion-grid">
+    <!-- ① 阻塞规则 -->
+    <div class="card fusion-item violet">
+      <div class="card-icon-circle violet">🪣</div>
+      <span class="tag">ROUTE 01</span>
+      <h3>阻塞规则分桶</h3>
+      <p>按 <strong>region</strong>（客户）/ <strong>category</strong>（商品）先分桶，把 O(n²) 全量比对降为 O(k × m²)，只在同桶内两两比较。</p>
+      <div class="code-block">
+<span class="kw">for</span> region_prefix <span class="kw">in</span> groups:<br>
+&nbsp;&nbsp;<span class="kw">for</span> pair <span class="kw">in</span> bucket:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">yield</span> (record_a, record_b)<br><br>
+<span class="kw">//</span> 跨地区/跨品类 → 不可能重复，直接跳过
+      </div>
+    </div>
+
+    <!-- ② Embedding -->
+    <div class="card fusion-item amber">
+      <div class="card-icon-circle amber">🧠</div>
+      <span class="tag">ROUTE 02</span>
+      <h3>bge-large-zh 语义向量</h3>
+      <p>基于 <strong>SentenceTransformer</strong> 加载预训练中文模型，将公司名称 / 商品名转为 1024 维向量，解决中英混合、缩写、同义词的相似度问题。</p>
+      <div class="code-block">
+<span class="kw">from</span> sentence_transformers <span class="kw">import</span> SentenceTransformer<br>
+model = SentenceTransformer(<span class="str">'bge-large-zh-v1.5'</span>)<br>
+vec_a = model.encode(name_a)<br>
+vec_b = model.encode(name_b)<br>
+sim = <span class="kw">cos_sim</span>(vec_a, vec_b)  <span class="kw">//</span> → <span class="num">[0,1]</span>
+      </div>
+    </div>
+
+    <!-- ③ 规则加权 -->
+    <div class="card fusion-item pink">
+      <div class="card-icon-circle pink">⚖️</div>
+      <span class="tag">ROUTE 03</span>
+      <h3>规则加权打分</h3>
+      <p>对税号 / 电话 / SKU / UPC 等结构化字段做精确匹配，地址用编辑距离加权，SKU 冲突会触发惩罚分。</p>
+      <div class="code-block">
+score = (name_sim × <span class="num">0.45</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;+ (tax_id_match × <span class="num">0.30</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;+ (phone_match × <span class="num">0.15</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;+ (addr_sim × <span class="num">0.10</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;+ bonus - penalty
+      </div>
+    </div>
+  </div>
+
+  <!-- 公式卡片 -->
+  <div class="formula-section">
+    <div class="card formula-card violet">
+      <div class="card-icon-circle violet">👥</div>
+      <div class="formula-title"><div class="emoji">👥</div>客户匹配 · 加权公式</div>
+      <div class="formula-body">
+        <div class="formula-line"><span class="weight-num w-violet">0.45</span><span class="field-name">名称语义相似度</span></div>
+        <div class="formula-line"><span class="op">+</span><span class="weight-num w-amber">0.30</span><span class="field-name">税号精确匹配</span></div>
+        <div class="formula-line"><span class="op">+</span><span class="weight-num w-pink">0.15</span><span class="field-name">电话精确匹配</span></div>
+        <div class="formula-line"><span class="op">+</span><span class="weight-num w-emerald">0.10</span><span class="field-name">地址编辑距离</span></div>
+        <div class="formula-line"><span class="op">+</span><span class="weight-num w-soft">+ bonus</span><span class="field-name">税号 / 电话加分项</span></div>
+      </div>
+    </div>
+    <div class="card formula-card pink">
+      <div class="card-icon-circle pink">📦</div>
+      <div class="formula-title"><div class="emoji">📦</div>商品匹配 · 加权公式</div>
+      <div class="formula-body">
+        <div class="formula-line"><span class="weight-num w-violet">0.20</span><span class="field-name">名称语义相似度</span></div>
+        <div class="formula-line"><span class="op">+</span><span class="weight-num w-amber">0.15</span><span class="field-name">品牌语义相似度</span></div>
+        <div class="formula-line"><span class="op">+</span><span class="weight-num w-pink">0.10</span><span class="field-name">型号语义相似度</span></div>
+        <div class="formula-line"><span class="op">+</span><span class="weight-num w-emerald">0.25</span><span class="field-name">SKU 精确匹配</span></div>
+        <div class="formula-line"><span class="op">+</span><span class="weight-num w-soft">0.15</span><span class="field-name">UPC 精确匹配</span></div>
+        <span class="penalty">− SKU / UPC 冲突惩罚（上限 0.55，不同 SKU = 不同商品变体）</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========= SECTION 3: 管道运行 ========= -->
+<section>
+  <div class="section-header">
+    <span class="section-step step-3">STEP 03 · 24–32 秒</span>
+    <h2 class="section-title">管道运行 · 三档分流决策</h2>
+    <p class="section-sub">客户 / 商品两个管道独立运行 · 高置信度自动合并 · 中等置信度进入审核队列 · 低置信度判定为不同实体</p>
+  </div>
+
+  <!-- 流程图 -->
+  <div class="flow-diagram">
+    <div class="flow-step">
+      <div class="num">1</div>
+      <div class="emoji">📥</div>
+      <h4>数据加载</h4>
+      <p>读取 5 个 CSV，字段标准化</p>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="num">2</div>
+      <div class="emoji">🧮</div>
+      <h4>三路打分</h4>
+      <p>阻塞 + Embedding + 规则</p>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="num">3</div>
+      <div class="emoji">🎯</div>
+      <h4>三档分流</h4>
+      <p>≥0.53 自动合并，其余 → 审核 / 不合并</p>
+    </div>
+  </div>
+
+  <!-- 阈值卡片 -->
+  <div class="pipeline-grid">
+    <div class="card threshold-card merge">
+      <div class="thresh-label">AUTO MERGE · 自动合并</div>
+      <div class="thresh-val">≥ 0.53</div>
+      <div class="thresh-sub">高置信度 → 直接写入黄金主数据表<br>召回率 98.2%</div>
+    </div>
+    <div class="card threshold-card review">
+      <div class="thresh-label">MANUAL REVIEW · 人工审核</div>
+      <div class="thresh-val">0.50 – 0.53</div>
+      <div class="thresh-sub">中等置信度 → 进入 review_queue<br>Dify LLM 二次判断</div>
+    </div>
+    <div class="card threshold-card nomatch">
+      <div class="thresh-label">NO MATCH · 判定不同实体</div>
+      <div class="thresh-val">&lt; 0.50</div>
+      <div class="thresh-sub">低置信度 → 不作为重复对处理<br>各自保留</div>
+    </div>
+  </div>
+
+  <!-- 审核队列产出 -->
+  <div class="queue-summary">
+    <div class="card queue-card violet">
+      <div class="big-num">241</div>
+      <div class="info">
+        <h4>customer_review_queue.csv</h4>
+        <p>客户侧待审核记录 · 约占候选对 3.9% · 较纯规则方案压缩 87%</p>
+      </div>
+    </div>
+    <div class="card queue-card pink">
+      <div class="big-num">31</div>
+      <div class="info">
+        <h4>product_review_queue.csv</h4>
+        <p>商品侧待审核记录 · 约占候选对 3.1% · SKU/UPC 冲突惩罚大幅降低误匹配</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CSV 预览 -->
+  <div class="csv-preview card">
+    <div class="card-icon-circle violet">📄</div>
+    <div class="csv-preview-title">
+      <span>🔍</span>
+      <span>customer_review_queue.csv · 预览（5 行示例）</span>
+    </div>
+    <table class="csv-table">
+      <thead>
+        <tr>
+          <th>record_id (A)</th>
+          <th>record_id (B)</th>
+          <th>source</th>
+          <th>公司名 A</th>
+          <th>公司名 B</th>
+          <th>region</th>
+          <th>tax_id 匹配</th>
+          <th>phone 匹配</th>
+          <th>embed_sim</th>
+          <th>final_score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>CRM-001032</td><td>ERP-000487</td><td>CRM ↔ ERP</td>
+          <td>北京阿尔法科技有限公司</td><td>北京 Alpha 科技公司</td>
+          <td>北京市</td><td>✓</td><td>✓</td>
+          <td class="score-cell high">0.94</td><td class="score-cell high">0.87</td>
+        </tr>
+        <tr>
+          <td>ERP-000921</td><td>ECO-000233</td><td>ERP ↔ ECO</td>
+          <td>上海卓越创新科技</td><td>上海卓越创新 (Zhuhai)</td>
+          <td>上海市</td><td>✓</td><td>✗</td>
+          <td class="score-cell high">0.81</td><td class="score-cell high">0.72</td>
+        </tr>
+        <tr>
+          <td>CRM-002201</td><td>ECO-000812</td><td>CRM ↔ ECO</td>
+          <td>深圳启迪商务实业</td><td>深圳启迪商务实业有限公司</td>
+          <td>深圳市</td><td>✓</td><td>✓</td>
+          <td class="score-cell high">0.92</td><td class="score-cell high">0.89</td>
+        </tr>
+        <tr>
+          <td>CRM-003101</td><td>ERP-002881</td><td>CRM ↔ ERP</td>
+          <td>广州智科贸易</td><td>广州市智科贸易有限公司</td>
+          <td>广州市</td><td>✗</td><td>✓</td>
+          <td class="score-cell mid">0.67</td><td class="score-cell mid">0.52</td>
+        </tr>
+        <tr>
+          <td>ECO-000555</td><td>ERP-001200</td><td>ECO ↔ ERP</td>
+          <td>贝特医疗器械</td><td>青岛贝特医疗科技</td>
+          <td>跨地区</td><td>✗</td><td>✗</td>
+          <td class="score-cell low">0.41</td><td class="score-cell low">0.22</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 终端窗口：管道运行 -->
+  <div class="terminal" style="margin-top:28px;">
+    <div class="terminal-bar"><span></span><span></span><span></span></div>
+    <div class="terminal-line prompt">cd scripts ; python mdm_pipeline.py</div>
+    <div class="terminal-line output">[INFO] 加载模型: BAAI/bge-large-zh-v1.5 ...</div>
+    <div class="terminal-line output">[INFO] 读取 crm_customers.csv · 1,600 行</div>
+    <div class="terminal-line output">[INFO] 读取 erp_customers.csv · 1,400 行</div>
+    <div class="terminal-line output">[INFO] 读取 ecommerce_customers.csv · 1,200 行</div>
+    <div class="terminal-line output">[INFO] 按 region 阻塞分桶 → 生成 12,447 对候选</div>
+    <div class="terminal-line output">[INFO] Embedding 预计算 ... 耗时 2.84 秒</div>
+    <div class="terminal-line output">[INFO] 规则加权打分 ... 完成</div>
+    <div class="terminal-line output">[INFO] ≥0.53 自动合并 → 3,412 对 ✓</div>
+    <div class="terminal-line output">[INFO] 0.50–0.53 进入审核队列 → 241 条</div>
+    <div class="terminal-line output">[INFO] &lt;0.50 判定不同实体 → 8,794 对</div>
+    <div class="terminal-line highlight">✨ customer_review_queue.csv 已生成 · 241 行</div>
+    <br>
+    <div class="terminal-line prompt">python product_pipeline.py</div>
+    <div class="terminal-line output">[INFO] 读取 erp_products.csv · 1,000 行</div>
+    <div class="terminal-line output">[INFO] 读取 ecommerce_products.csv · 1,000 行</div>
+    <div class="terminal-line output">[INFO] 按 category 阻塞分桶 → SKU/UPC 冲突惩罚启用</div>
+    <div class="terminal-line output">[INFO] ≥0.54 自动合并 → 782 对 ✓</div>
+    <div class="terminal-line output">[INFO] 0.51–0.54 进入审核队列 → 31 条</div>
+    <div class="terminal-line highlight">✨ product_review_queue.csv 已生成 · 31 行</div>
+  </div>
+</section>
+
+<!-- ========= FOOTER ========= -->
+<footer>
+  <div class="footer-title">MDM 主数据管理智能清洗系统</div>
+  <div>基于 Dify + bge-large-zh-v1.5 + 规则引擎 · 跨源数据接入 → 三路匹配 → 管道运行与审核闭环</div>
+  <div style="margin-top:12px;font-size:11px;opacity:0.7;">文件位置：e:\classes\big_data\demo\mem-demo\demo_showcase.html</div>
+</footer>
+
+</body>
+</html>
