@@ -54,3 +54,5 @@ data/cache/
 # OS
 .DS_Store
 Thumbs.db
+.env
+data/normalization_log.csv

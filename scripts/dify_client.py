@@ -225,3 +225,81 @@ if __name__ == "__main__":
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:
         print("请在 dify/config.json 中配置 api_key 后重试。")
+
+# ============================================================
+# 通用聊天客户端（供 M3 数据标准化、M4 Chat 等模块使用）
+# ============================================================
+
+# ============================================================
+# 通用工作流客户端（供 M3 数据标准化等模块使用）
+# ============================================================
+
+class DifyClient:
+    """通用 Dify 工作流客户端（调用 /v1/workflows/run 接口）"""
+
+    def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None):
+        self.api_key = api_key or _env_or_config("api_key")
+        self.base_url = (base_url or _env_or_config("base_url", "https://api.dify.ai")).rstrip("/")
+        # ★★★ 关键修复：使用工作流接口，不是聊天接口 ★★★
+        self.endpoint = f"{self.base_url}/workflows/run"
+
+        if not self.api_key:
+            print("⚠️ 警告: DIFY_API_KEY 未设置，LLM 功能将不可用")
+        else:
+            print("✅ Dify 工作流客户端初始化成功")
+
+    @property
+    def available(self) -> bool:
+        return bool(self.api_key)
+
+    def chat(self, user_input: str, user_id: str = "normalize_agent") -> dict:
+        """
+        发送消息到 Dify 工作流应用
+
+        Args:
+            user_input: 用户输入的内容（会作为 inputs 传入）
+            user_id: 用户标识
+
+        Returns:
+            dict: {"answer": "回复内容", "success": True/False}
+        """
+        if not self.available:
+            return {"answer": "", "error": "API Key 未设置", "success": False}
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+        
+        # ★★★ 工作流接口的输入格式 ★★★
+        payload = {
+            "inputs": {
+                "query": user_input  # 把用户输入作为工作流的输入变量
+            },
+            "response_mode": "blocking",
+            "user": user_id,
+        }
+
+        try:
+            resp = requests.post(self.endpoint, json=payload, headers=headers, timeout=120,verify=False)
+            resp.raise_for_status()
+            data = resp.json()
+            
+            # 工作流返回的格式：{"data": {"outputs": {...}}}
+            if "data" in data and "outputs" in data["data"]:
+                outputs = data["data"]["outputs"]
+                # 尝试从 outputs 中提取答案
+                answer = outputs.get("answer") or outputs.get("text") or outputs.get("result") or str(outputs)
+                return {
+                    "answer": answer,
+                    "success": True,
+                }
+            else:
+                return {
+                    "answer": str(data),
+                    "success": True,
+                }
+                
+        except requests.exceptions.RequestException as e:
+            print(f"❌ Dify API 调用失败: {e}")
+            return {"answer": "", "error": str(e), "success": False}
