@@ -103,7 +103,7 @@ except ImportError:
 
 ## Configuration & External Services
 
-- **Dify** (`dify/config.json`, gitignored): `{ "api_key": "app-…", "base_url": "https://api.dify.ai" }`. Note `base_url` is `api.dify.ai`, **not** `cloud.dify.ai`. The key can also come from env `DIFY_API_KEY` (see `_env_or_config` in `dify_client.py`). Workflow DSL is in `dify/mdm_workflow.yml`. All Dify calls degrade gracefully (return `decision=review`) when unavailable — mirror this try/except pattern in any new LLM call.
+- **Dify** (`dify/config.json`, gitignored): `{ "api_key": "app-…", "base_url": "https://api.dify.ai" }`. Note `base_url` is `api.dify.ai`, **not** `cloud.dify.ai`. The key can also come from env `DIFY_API_KEY` (see `_env_or_config` in `dify_client.py`). **One Dify app = one workflow = one api_key**: the entity-match workflow is `dify/mdm_workflow.yml` (key `api_key`); the M2 quality-assessment workflow is `dify/quality_workflow.yml` (key `quality_api_key` / env `DIFY_QUALITY_API_KEY`). All Dify calls degrade gracefully when unavailable — mirror this try/except pattern in any new LLM call.
 - **Database** (`scripts/db_manager.py` `DBManager`): SQLite by default (`data/mdm.db`, gitignored), optional PostgreSQL via `sql/pg_config.json`. Access through the `get_db()` singleton.
 - **Cache** (`scripts/cache_manager.py`): local-file in dev, optional Redis in prod (`sql/redis_config.json`).
 

@@ -182,6 +182,20 @@ python quality_agent.py --source crm_customers.csv
 
 检测维度：缺失值 / 重复行 / 格式（电话/税号/邮箱/网址/日期）/ 异常值 / 跨源一致性，综合评分 0–100。
 
+#### 启用 Dify LLM 增强（可选）
+
+质量评估的 LLM 增强使用**独立工作流**（与实体匹配工作流分开，一个 Dify app 对应一个 api_key）：
+
+1. Dify 首页 →「创建应用」→「工作流」→「导入 DSL 文件」→ 上传 `dify/quality_workflow.yml`
+2. LLM 节点选 `deepseek-chat`，发布后在「API 访问」复制 API Key
+3. 在 `dify/config.json` 填入：
+
+```json
+{ "quality_api_key": "app-你的Key", "quality_base_url": "https://api.dify.ai" }
+```
+
+配置后再运行 `python quality_agent.py --source crm_customers.csv`，报告的「LLM 整改建议」章节即自动填充。未配置则降级为纯统计报告，不报错。
+
 ### 第八步：数据迁移到数据库
 
 ```bash

@@ -1,0 +1,355 @@
+app:
+  description: MDM 数据质量评估智能体 — 基于 Baseline 统计扫描结果生成中文整改建议报告
+  icon: 🛡️
+  icon_background: '#16A34A'
+  icon_type: emoji
+  mode: workflow
+  name: MDM-Data-Quality-Agent
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/deepseek:0.0.17@f7a5c1d222d17ee419b17a80d6e4923838fe93788dc724a3af73fbc6990b3a32
+    version: null
+kind: app
+version: 0.6.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 50
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: llm
+      id: 2000000000001-source-2000000000002-target
+      source: '2000000000001'
+      sourceHandle: source
+      target: '2000000000002'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: 2000000000002-source-2000000000003-target
+      source: '2000000000002'
+      sourceHandle: source
+      target: '2000000000003'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: end
+      id: 2000000000003-source-2000000000004-target
+      source: '2000000000003'
+      sourceHandle: source
+      target: '2000000000004'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: 接收实体类型、数据源名与 Baseline 统计扫描结果 JSON。
+        selected: false
+        title: 开始
+        type: start
+        variables:
+        - default: ''
+          hint: ''
+          label: entity_type
+          options: []
+          placeholder: customer 或 product
+          required: true
+          type: text-input
+          variable: entity_type
+        - default: ''
+          hint: ''
+          label: source
+          options: []
+          placeholder: 数据源名（可多个，逗号分隔）
+          required: false
+          type: text-input
+          variable: source
+        - default: ''
+          hint: ''
+          label: quality_payload
+          options: []
+          placeholder: Baseline 统计扫描结果 JSON 字符串
+          required: true
+          type: paragraph
+          variable: quality_payload
+      height: 265
+      id: '2000000000001'
+      position:
+        x: 80
+        y: 200
+      positionAbsolute:
+        x: 80
+        y: 200
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: LLM 分析 Baseline 扫描结果，生成中文数据质量整改建议。
+        model:
+          completion_params:
+            temperature: 0.2
+          mode: chat
+          name: deepseek-v4-flash
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: a1b2c3d4-e5f6-7890-abcd-ef1234567891
+          role: system
+          text: |
+            你是一个主数据管理（MDM）数据质量专家。你的任务是分析客户/商品数据集的 Baseline 统计扫描结果，生成中文数据质量整改建议报告。
+
+            ## 分析维度
+
+            基于以下五大质量维度给出具体建议：
+
+            1. 缺失值（completeness）：哪些字段缺失、比例多少、建议从哪里补全（如"从 ERP 回补税号"）。
+            2. 重复数据（uniqueness）：是否存在完全重复行、canonical 主键单源内重复，给出去重策略。
+            3. 格式合规（validity）：哪些字段格式不统一（电话/邮箱/税号/日期），给出标准格式与清洗方案。
+            4. 异常值（outliers）：数值字段（如价格）是否存在统计异常，分析可能原因（录入错误/跨源差异/促销折扣）。
+            5. 一致性（consistency）：同一实体在多源中字段值是否一致，标注冲突最严重的字段和典型样本。
+
+            ## 输出要求
+
+            - 语言：中文。
+            - 建议必须具体、可执行（如"对 phone 统一为 11 位数字格式"，而非笼统的"建议修复"）。
+            - 按优先级排序整改建议，最紧急的排前面。
+
+            ## 输出格式（严格 JSON，不要包含 ``` 代码块标记）：
+
+            {"补全建议":"针对缺失值的具体补全方案（1-3句）","去重建议":"针对重复数据的具体去重方案（1-3句）","异常原因":"解释格式异常与数值异常值的可能原因（2-4句）","整改优先级":["P0 紧急项","P1 高优项","P2 建议项"],"总结":"总体质量评价 + 最关键的 1-2 个行动建议"}
+        - id: b2c3d4e5-f6a7-8901-bcde-f12345678912
+          role: user
+          text: |-
+            请分析以下 {{#2000000000001.entity_type#}} 数据的质量扫描结果，给出整改建议。
+
+            数据源：{{#2000000000001.source#}}
+
+            === Baseline 统计扫描结果 ===
+
+            {{#2000000000001.quality_payload#}}
+
+            请按系统提示中的 JSON 格式输出分析结果。
+        selected: false
+        title: LLM 质量评估
+        type: llm
+        vision:
+          enabled: false
+      height: 133
+      id: '2000000000002'
+      position:
+        x: 405
+        y: 200
+      positionAbsolute:
+        x: 405
+        y: 200
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        code: |
+          import json
+          import re
+
+          def extract_json(text: str) -> str:
+              """从 LLM 输出中提取 JSON（支持嵌套对象）"""
+              text = text.strip()
+              text = re.sub(r'```(?:json)?\s*', '', text)
+              text = re.sub(r'\s*```', '', text)
+              start = text.find('{')
+              if start == -1:
+                  return ''
+              depth = 0
+              for i in range(start, len(text)):
+                  if text[i] == '{':
+                      depth += 1
+                  elif text[i] == '}':
+                      depth -= 1
+                      if depth == 0:
+                          return text[start:i + 1]
+              return ''
+
+          def main(llm_output: str) -> dict:
+              json_str = extract_json(llm_output)
+              if not json_str:
+                  return {
+                      "补全建议": "LLM 输出中未找到 JSON",
+                      "去重建议": "",
+                      "异常原因": "",
+                      "整改优先级": [],
+                      "总结": "",
+                  }
+              try:
+                  result = json.loads(json_str)
+              except json.JSONDecodeError:
+                  return {
+                      "补全建议": "JSON 解析失败: " + json_str[:100],
+                      "去重建议": "",
+                      "异常原因": "",
+                      "整改优先级": [],
+                      "总结": "",
+                  }
+              prio = result.get("整改优先级", [])
+              if not isinstance(prio, list):
+                  prio = [str(prio)]
+              return {
+                  "补全建议": str(result.get("补全建议", "")),
+                  "去重建议": str(result.get("去重建议", "")),
+                  "异常原因": str(result.get("异常原因", "")),
+                  "整改优先级": [str(x) for x in prio],
+                  "总结": str(result.get("总结", "")),
+              }
+        code_language: python3
+        desc: 解析 LLM 输出的 JSON，提取补全建议/去重建议/异常原因/整改优先级/总结。
+        outputs:
+          补全建议:
+            children: null
+            type: string
+          去重建议:
+            children: null
+            type: string
+          异常原因:
+            children: null
+            type: string
+          整改优先级:
+            children: null
+            type: array[string]
+          总结:
+            children: null
+            type: string
+        selected: false
+        title: 解析 JSON
+        type: code
+        variables:
+        - value_selector:
+          - '2000000000002'
+          - text
+          variable: llm_output
+      height: 97
+      id: '2000000000003'
+      position:
+        x: 728
+        y: 200
+      positionAbsolute:
+        x: 728
+        y: 200
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        desc: 输出数据质量整改建议结果。
+        outputs:
+        - value_selector:
+          - '2000000000003'
+          - 补全建议
+          value_type: string
+          variable: 补全建议
+        - value_selector:
+          - '2000000000003'
+          - 去重建议
+          value_type: string
+          variable: 去重建议
+        - value_selector:
+          - '2000000000003'
+          - 异常原因
+          value_type: string
+          variable: 异常原因
+        - value_selector:
+          - '2000000000003'
+          - 整改优先级
+          value_type: array[string]
+          variable: 整改优先级
+        - value_selector:
+          - '2000000000003'
+          - 总结
+          value_type: string
+          variable: 总结
+        selected: false
+        title: 结束
+        type: end
+      height: 195
+      id: '2000000000004'
+      position:
+        x: 1052
+        y: 200
+      positionAbsolute:
+        x: 1052
+        y: 200
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    viewport:
+      x: -281.5
+      y: 272.5
+      zoom: 1
+  rag_pipeline_variables: []
