@@ -163,7 +163,40 @@ python dify_enrich.py product
 
 > 详细图文教程：[dify/README.md](dify/README.md)
 
-### 第七步：数据迁移到数据库
+### 第七步：数据质量评估（DataGuardian M2 智能体）
+
+```bash
+cd scripts
+
+# 单源质量扫描（评分 + 问题列表）
+python quality_agent.py --source crm_customers.csv
+
+# 跨源一致性对比（按 canonical_*_id 分组发现字段冲突）
+python quality_agent.py --compare --source crm_customers.csv --source erp_customers.csv --source ecommerce_customers.csv
+
+# 基线统计 + Dify LLM 增强中文报告（需先在 dify/config.json 配置 quality_api_key）
+python quality_agent.py --source crm_customers.csv
+```
+
+输出 `data/quality_report.json` 和 `data/quality_report.md`。LLM 未配置时自动降级为纯统计报告，不报错。
+
+检测维度：缺失值 / 重复行 / 格式（电话/税号/邮箱/网址/日期）/ 异常值 / 跨源一致性，综合评分 0–100。
+
+#### 启用 Dify LLM 增强（可选）
+
+质量评估的 LLM 增强使用**独立工作流**（与实体匹配工作流分开，一个 Dify app 对应一个 api_key）：
+
+1. Dify 首页 →「创建应用」→「工作流」→「导入 DSL 文件」→ 上传 `dify/quality_workflow.yml`
+2. LLM 节点选 `deepseek-chat`，发布后在「API 访问」复制 API Key
+3. 在 `dify/config.json` 填入：
+
+```json
+{ "quality_api_key": "app-你的Key", "quality_base_url": "https://api.dify.ai" }
+```
+
+配置后再运行 `python quality_agent.py --source crm_customers.csv`，报告的「LLM 整改建议」章节即自动填充。未配置则降级为纯统计报告，不报错。
+
+### 第八步：数据迁移到数据库
 
 ```bash
 # SQLite
