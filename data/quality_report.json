@@ -1,0 +1,369 @@
+{
+  "generated_at": "2026-07-02T18:54:17",
+  "agent": "data_quality",
+  "entity_type": "customer",
+  "sources": [
+    {
+      "source": "crm_customers.csv",
+      "row_count": 1600,
+      "score": 66,
+      "band": "一般",
+      "breakdown": {
+        "completeness": 100.0,
+        "uniqueness": 100.0,
+        "validity": 39.2,
+        "consistency": 24.6
+      },
+      "weights": {
+        "completeness": 0.3,
+        "uniqueness": 0.2,
+        "validity": 0.25,
+        "consistency": 0.25
+      },
+      "dimensions": {
+        "missing": {
+          "issue_count": 0,
+          "missing_cells": 0,
+          "total_cells": 16000,
+          "fields": {}
+        },
+        "duplicates": {
+          "issue_count": 0,
+          "duplicated_rows": 0,
+          "canonical_id_duplicates": 0,
+          "note": "本数据集单源 ≈0；重复均为跨源（见一致性检测）"
+        },
+        "format": {
+          "issue_count": 2,
+          "total_invalid_cells": 1945,
+          "total_checked_cells": 3200,
+          "fields": {
+            "phone": {
+              "invalid": 345,
+              "total": 1600,
+              "pattern": "座机(XXX-XXXX-XXXX) 或 手机(1xxxxxxxxxx)",
+              "sample": [
+                "0532-6841-8644",
+                "0571-4351-6979",
+                "0532-8738-1150",
+                "0532-9455-8611",
+                "0755-5151-9861"
+              ]
+            },
+            "website": {
+              "invalid": 1600,
+              "total": 1600,
+              "pattern": "xxx.xxx",
+              "sample": [
+                "www.杭州瑞丰信息技术.com",
+                "www.长沙天宇集团信息技术.com",
+                "www.南京安联集团.com",
+                "www.长沙宏达信息技术.com",
+                "www.武汉星辰集团.com"
+              ]
+            }
+          }
+        },
+        "outliers": {
+          "applicable": false,
+          "note": "客户数据无数值字段，跳过"
+        },
+        "consistency": {}
+      }
+    },
+    {
+      "source": "erp_customers.csv",
+      "row_count": 1400,
+      "score": 66,
+      "band": "一般",
+      "breakdown": {
+        "completeness": 100.0,
+        "uniqueness": 100.0,
+        "validity": 39.9,
+        "consistency": 24.6
+      },
+      "weights": {
+        "completeness": 0.3,
+        "uniqueness": 0.2,
+        "validity": 0.25,
+        "consistency": 0.25
+      },
+      "dimensions": {
+        "missing": {
+          "issue_count": 0,
+          "missing_cells": 0,
+          "total_cells": 14000,
+          "fields": {}
+        },
+        "duplicates": {
+          "issue_count": 0,
+          "duplicated_rows": 0,
+          "canonical_id_duplicates": 0,
+          "note": "本数据集单源 ≈0；重复均为跨源（见一致性检测）"
+        },
+        "format": {
+          "issue_count": 2,
+          "total_invalid_cells": 1683,
+          "total_checked_cells": 2800,
+          "fields": {
+            "phone": {
+              "invalid": 283,
+              "total": 1400,
+              "pattern": "座机(XXX-XXXX-XXXX) 或 手机(1xxxxxxxxxx)",
+              "sample": [
+                "0731-9553-5098",
+                "0532-3385-9255",
+                "0532-8817-6581",
+                "0532-5590-5692",
+                "0755-6835-5915"
+              ]
+            },
+            "website": {
+              "invalid": 1400,
+              "total": 1400,
+              "pattern": "xxx.xxx",
+              "sample": [
+                "www.杭州瑞丰信息技术.com",
+                "www.上海启迪集团.com",
+                "www.成都先锋实业.com",
+                "www.杭州卓越信息技术.com",
+                "www.广州天宇商务.com"
+              ]
+            }
+          }
+        },
+        "outliers": {
+          "applicable": false,
+          "note": "客户数据无数值字段，跳过"
+        },
+        "consistency": {}
+      }
+    },
+    {
+      "source": "ecommerce_customers.csv",
+      "row_count": 1200,
+      "score": 66,
+      "band": "一般",
+      "breakdown": {
+        "completeness": 100.0,
+        "uniqueness": 100.0,
+        "validity": 40.0,
+        "consistency": 24.6
+      },
+      "weights": {
+        "completeness": 0.3,
+        "uniqueness": 0.2,
+        "validity": 0.25,
+        "consistency": 0.25
+      },
+      "dimensions": {
+        "missing": {
+          "issue_count": 0,
+          "missing_cells": 0,
+          "total_cells": 12000,
+          "fields": {}
+        },
+        "duplicates": {
+          "issue_count": 0,
+          "duplicated_rows": 0,
+          "canonical_id_duplicates": 0,
+          "note": "本数据集单源 ≈0；重复均为跨源（见一致性检测）"
+        },
+        "format": {
+          "issue_count": 2,
+          "total_invalid_cells": 1441,
+          "total_checked_cells": 2400,
+          "fields": {
+            "phone": {
+              "invalid": 241,
+              "total": 1200,
+              "pattern": "座机(XXX-XXXX-XXXX) 或 手机(1xxxxxxxxxx)",
+              "sample": [
+                "0755-7577-6897",
+                "0731-3307-6357",
+                "0731-6249-6971",
+                "0532-9153-8113",
+                "0731-1686-7965"
+              ]
+            },
+            "website": {
+              "invalid": 1200,
+              "total": 1200,
+              "pattern": "xxx.xxx",
+              "sample": [
+                "www.深圳星辰国际.com",
+                "www.成都启迪创新.com",
+                "www.深圳智科.com",
+                "www.长沙天宇集团信息技术.com",
+                "www.青岛恒信集团.com"
+              ]
+            }
+          }
+        },
+        "outliers": {
+          "applicable": false,
+          "note": "客户数据无数值字段，跳过"
+        },
+        "consistency": {}
+      }
+    }
+  ],
+  "cross_source_summary": {
+    "shared_entities": 840,
+    "conflict_groups": 633,
+    "by_field": {
+      "phone": 428,
+      "address": 257,
+      "company_name": 117,
+      "tax_id": 159
+    },
+    "samples": [
+      {
+        "canonical_id": "CUST00002",
+        "source_count": 2,
+        "conflicts": {
+          "phone_dict": [
+            "168720576383",
+            "178663347634"
+          ]
+        }
+      },
+      {
+        "canonical_id": "CUST00008",
+        "source_count": 2,
+        "conflicts": {
+          "phone": [
+            "146860864911",
+            "010-4363-6407"
+          ]
+        }
+      },
+      {
+        "canonical_id": "CUST00010",
+        "source_count": 2,
+        "conflicts": {
+          "address": [
+            "陕西省咸阳市马鞍山街260号院",
+            "陕西省咸阳市马鞍山街260号楼园"
+          ]
+        }
+      },
+      {
+        "canonical_id": "CUST00018",
+        "source_count": 2,
+        "conflicts": {
+          "phone": [
+            "020-8393-3514",
+            "0571-1475-7371"
+          ]
+        }
+      },
+      {
+        "canonical_id": "CUST00021",
+        "source_count": 2,
+        "conflicts": {
+          "phone": [
+            "137419169823",
+            "025-2419-5569"
+          ]
+        }
+      },
+      {
+        "canonical_id": "CUST00026",
+        "source_count": 2,
+        "conflicts": {
+          "phone_dict": [
+            "154810594163",
+            "198846173157"
+          ]
+        }
+      },
+      {
+        "canonical_id": "CUST00033",
+        "source_count": 2,
+        "conflicts": {
+          "phone": [
+            "027-5010-2338",
+            "139249609054"
+          ]
+        }
+      },
+      {
+        "canonical_id": "CUST00040",
+        "source_count": 2,
+        "conflicts": {
+          "company_name": [
+            "杭州智科国际科公司",
+            "杭州智科国际科技有限公司"
+          ],
+          "phone_dict": [
+            "133122315507",
+            "139543999114"
+          ]
+        }
+      },
+      {
+        "canonical_id": "CUST00041",
+        "source_count": 2,
+        "conflicts": {
+          "company_name": [
+            "武汉宏达集团Alpha有限公司",
+            "武汉宏达集团科公司"
+          ],
+          "address": [
+            "湖南省常德市朱街270号楼园",
+            "湖南省常德市朱街270号院"
+          ],
+          "phone": [
+            "028-4128-3789",
+            "0755-1897-1125"
+          ]
+        }
+      },
+      {
+        "canonical_id": "CUST00047",
+        "source_count": 2,
+        "conflicts": {
+          "phone": [
+            "0532-4891-8277",
+            "020-5696-7393"
+          ]
+        }
+      }
+    ]
+  },
+  "compare_scorecard": {
+    "sources": [
+      {
+        "source": "crm_customers.csv",
+        "score": 66,
+        "band": "一般",
+        "issue_total": 2,
+        "rank": 1
+      },
+      {
+        "source": "erp_customers.csv",
+        "score": 66,
+        "band": "一般",
+        "issue_total": 2,
+        "rank": 2
+      },
+      {
+        "source": "ecommerce_customers.csv",
+        "score": 66,
+        "band": "一般",
+        "issue_total": 2,
+        "rank": 3
+      }
+    ],
+    "ranking": [
+      "crm_customers.csv",
+      "erp_customers.csv",
+      "ecommerce_customers.csv"
+    ],
+    "best": "crm_customers.csv"
+  },
+  "llm": {
+    "available": false
+  }
+}
